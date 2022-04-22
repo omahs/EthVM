@@ -1,0 +1,9 @@
+{
+  "packages": [
+    "client",
+    "ingestor",
+    "server"
+  ],
+  "version": "independent",
+  "npmClient": "pnpm"
+}
