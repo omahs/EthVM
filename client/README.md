@@ -1,4 +1,4 @@
-# client
+# my-beta-app
 
 ## Project setup
 ```
