@@ -1,20 +1,20 @@
 lockfileVersion: 5.3
 
 specifiers:
+  '@types/node': ^17.0.25
   commitizen: ^4.2.4
   cz-conventional-changelog: ^3.3.0
   husky: ^7.0.4
-  init: ^0.1.2
   lerna: ^4.0.0
-  sax: ^1.2.4
+  typescript: ^4.6.3
 
 devDependencies:
+  '@types/node': 17.0.25
   commitizen: 4.2.4
   cz-conventional-changelog: 3.3.0
   husky: 7.0.4
-  init: 0.1.2
   lerna: 4.0.0
-  sax: 1.2.4
+  typescript: 4.6.3
 
 packages:
 
@@ -1036,7 +1036,6 @@ packages:
   /@types/node/17.0.25:
     resolution: {integrity: sha512-wANk6fBrUwdpY4isjWrKTufkrXdu1D2YHCot2fD/DfWxF5sMrVSA+KN7ydckvaTCh0HiqX9IVl0L5/ZoXg5M7w==}
     dev: true
-    optional: true
 
   /@types/normalize-package-data/2.4.1:
     resolution: {integrity: sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==}
@@ -1698,11 +1697,6 @@ packages:
     transitivePeerDependencies:
       - '@swc/core'
       - '@swc/wasm'
-    dev: true
-
-  /daemon/1.1.0:
-    resolution: {integrity: sha1-bFECyB2wvoVvyQCPwsk1s5iGSug=}
-    engines: {node: '>= 0.8.0'}
     dev: true
 
   /dargs/7.0.0:
@@ -2527,13 +2521,6 @@ packages:
       semver: 7.3.7
       validate-npm-package-license: 3.0.4
       validate-npm-package-name: 3.0.0
-    dev: true
-
-  /init/0.1.2:
-    resolution: {integrity: sha1-mIKsFScHvMun/iIHyN+AUIdcFQQ=}
-    engines: {node: '>=0.4.7'}
-    dependencies:
-      daemon: 1.1.0
     dev: true
 
   /inquirer/6.5.2:
@@ -4142,10 +4129,6 @@ packages:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
     dev: true
 
-  /sax/1.2.4:
-    resolution: {integrity: sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==}
-    dev: true
-
   /semver/5.7.1:
     resolution: {integrity: sha512-sauaDf/PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ==}
     hasBin: true
@@ -4652,7 +4635,6 @@ packages:
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
-    optional: true
 
   /uglify-js/3.15.4:
     resolution: {integrity: sha512-vMOPGDuvXecPs34V74qDKk4iJ/SN4vL3Ow/23ixafENYvtrNvtbcgUeugTcUGRGsOF/5fU8/NYSL5Hyb3l1OJA==}
