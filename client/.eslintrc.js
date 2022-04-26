@@ -3,17 +3,8 @@ module.exports = {
     env: {
         node: true
     },
-    extends: ['plugin:vue/vue3-essential', 'eslint:recommended', '@vue/typescript/recommended', 'plugin:prettier/recommended'],
+    extends: ['../.eslintrc.js', 'plugin:vue/vue3-essential', '@vue/typescript/recommended'],
     rules: {
-        curly: 'error',
-        'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-        'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-        'no-else-return': ['error', { allowElseIf: true }],
-        'arrow-parens': 'off',
-        'generator-star-spacing': 'off',
-        semi: 'off',
-        'prefer-const': 'error',
-        'no-var': 'error',
         'vue/no-unused-vars': 'error',
         'vue/require-default-prop': 'off',
         'vue/custom-event-name-casing': 'off'
