@@ -1,18 +1,8 @@
 <template>
-    <hello-world />
+    <block-stats-module />
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-
+<script setup lang="ts">
 // Components
-import HelloWorld from '../core/components/HelloWorld.vue'
-
-export default defineComponent({
-    name: 'HomeView',
-
-    components: {
-        HelloWorld
-    }
-})
+import BlockStatsModule from '../modules/block/BlockStatsModule.vue'
 </script>
