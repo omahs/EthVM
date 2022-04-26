@@ -1,3 +1,10 @@
 {
-    "prettier": "../.prettierrc"
+    "printWidth": 160,
+    "useTabs": false,
+    "tabWidth": 4,
+    "semi": false,
+    "singleQuote": true,
+    "bracketSpacing": true,
+    "arrowParens": "avoid",
+    "trailingComma": "none"
 }
