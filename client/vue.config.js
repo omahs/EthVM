@@ -1,4 +1,5 @@
 const { defineConfig } = require('@vue/cli-service')
+const path = require('path')
 module.exports = defineConfig({
     transpileDependencies: true,
     pluginOptions: {
@@ -14,6 +15,14 @@ module.exports = defineConfig({
                     use: 'graphql-tag/loader'
                 }
             ]
+        },
+        resolve: {
+            alias: {
+                '@': path.resolve(__dirname, 'src/'),
+                '@module': path.resolve(__dirname, 'src/modules/'),
+                '@view': path.resolve(__dirname, 'src/views/'),
+                '@core': path.resolve(__dirname, 'src/core/')
+            }
         }
     }
 })

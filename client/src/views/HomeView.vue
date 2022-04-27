@@ -4,5 +4,5 @@
 
 <script setup lang="ts">
 // Components
-import BlockStatsModule from '../modules/block/BlockStatsModule.vue'
+import BlockStatsModule from '@module/block/BlockStatsModule.vue'
 </script>
