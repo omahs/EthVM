@@ -30,7 +30,7 @@
 import { ref, computed } from 'vue'
 //Apollo
 import { useQuery, useResult } from '@vue/apollo-composable'
-import getLatestBlockInfo from './apollo/blockStats.graphql'
+import getLatestBlockInfo from './apollo/BlockStats/blockStats.graphql'
 import { useBlockSubscription } from '@/core/mixins/newBlock.mixin'
 
 import BN from 'bignumber.js'
@@ -41,21 +41,21 @@ import BlockStatsCard from './components/BlockStatsCard.vue'
 const { result: blockInfo, error, onResult, loading, refetch } = useQuery(getLatestBlockInfo)
 const { onNewBlockLoaded } = useBlockSubscription()
 
-const blockNumber = useResult(blockInfo, null, data => new BN(data.getLatestBlockInfo.number).toString())
+const blockNumber = useResult(blockInfo, null, data => new BN(data.getLatestBlockInfo.number).toFormat())
 const latestBlockInfo = useResult(blockInfo, null, data => data.getLatestBlockInfo)
 const timestamp = ref(new Date().toString())
 
 // Computed properties
 const latestHashRate = computed<string>(() => {
     if (latestBlockInfo.value) {
-        return new BN(latestBlockInfo.value.hashRate).div('1e12').decimalPlaces(2).toString()
+        return new BN(latestBlockInfo.value.hashRate).div('1e12').decimalPlaces(2).toFormat()
     }
     return ''
 })
 
 const latestDifficulty = computed<string>(() => {
     if (latestBlockInfo.value) {
-        return new BN(latestBlockInfo.value.difficulty).div('1e12').decimalPlaces(2).toString()
+        return new BN(latestBlockInfo.value.difficulty).div('1e12').decimalPlaces(2).toFormat()
     }
     return ''
 })
