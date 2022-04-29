@@ -41,23 +41,23 @@ import BlockStatsCard from './components/BlockStatsCard.vue'
 const { result: blockInfo, error, onResult, loading, refetch } = useQuery(getLatestBlockInfo)
 const { onNewBlockLoaded } = useBlockSubscription()
 
-const blockNumber = useResult(blockInfo, null, data => data.getLatestBlockInfo.number)
+const blockNumber = useResult(blockInfo, null, data => new BN(data.getLatestBlockInfo.number).toString())
 const latestBlockInfo = useResult(blockInfo, null, data => data.getLatestBlockInfo)
 const timestamp = ref(new Date().toString())
 
 // Computed properties
-const latestHashRate = computed(() => {
+const latestHashRate = computed<string>(() => {
     if (latestBlockInfo.value) {
-        return new BN(latestBlockInfo.value.hashRate).div('1e12').decimalPlaces(2).toNumber()
+        return new BN(latestBlockInfo.value.hashRate).div('1e12').decimalPlaces(2).toString()
     }
-    return null
+    return ''
 })
 
-const latestDifficulty = computed(() => {
+const latestDifficulty = computed<string>(() => {
     if (latestBlockInfo.value) {
-        return new BN(latestBlockInfo.value.difficulty).div('1e12').decimalPlaces(2).toNumber()
+        return new BN(latestBlockInfo.value.difficulty).div('1e12').decimalPlaces(2).toString()
     }
-    return null
+    return ''
 })
 
 onNewBlockLoaded(res => {
