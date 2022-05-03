@@ -1,7 +1,7 @@
 import { isAPIExceptionProduction, isAPIExceptionDev } from './errorExceptions'
-import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client/core'
+import { ApolloClient, HttpLink, InMemoryCache, split } from '@apollo/client/core'
 import { RetryLink } from '@apollo/client/link/retry'
-import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
+import { WebSocketLink } from '@apollo/client/link/ws'
 import { createClient } from 'graphql-ws'
 import { onError } from '@apollo/client/link/error'
 import { getMainDefinition } from '@apollo/client/utilities'
@@ -19,16 +19,16 @@ import configs from '../configs'
   ===================================================================================
 */
 
-const httpLink = createHttpLink({
+const httpLink = new HttpLink({
     uri: configs.APOLLO_HTTP
 })
 
-const wsLink = new GraphQLWsLink(
-    createClient({
-        url: configs.APOLLO_WS,
-        lazy: true
-    })
-)
+const wsLink = new WebSocketLink({
+    uri: configs.APOLLO_WS,
+    options: {
+        reconnect: true
+    }
+})
 
 const onErrorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
     if (graphQLErrors) {
@@ -61,14 +61,15 @@ const retry = new RetryLink({
         retryIf: (error, _operation) => (error && error.message ? error.message.includes('Failed to fetch') : false)
     }
 })
-const link = retry.split(
+const link = split(
     // split based on operation type
     ({ query }) => {
         const definition = getMainDefinition(query)
         return definition.kind === 'OperationDefinition' && definition.operation === 'subscription'
     },
     wsLink,
-    onErrorLink.concat(httpLink)
+    // onErrorLink.concat(httpLink)
+    httpLink
 )
 
 const cache = new InMemoryCache()
