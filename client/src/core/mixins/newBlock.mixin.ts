@@ -1,10 +1,7 @@
-import { NewBlockFeedSubscription as NewBlockFeedType } from './newBlockFeed.generated'
-import newBlockFeed from './newBlockFeed.graphql'
-import { useSubscription } from '@vue/apollo-composable'
-import { ref } from 'vue'
+import { useNewBlockFeedSubscription } from './newBlockFeed.generated'
 
 export function useBlockSubscription() {
-    const { onResult } = useSubscription(newBlockFeed)
+    const { onResult } = useNewBlockFeedSubscription()
     return {
         onNewBlockLoaded: onResult
     }

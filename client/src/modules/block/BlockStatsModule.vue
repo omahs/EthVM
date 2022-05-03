@@ -29,8 +29,8 @@
 //Vue
 import { ref, computed } from 'vue'
 //Apollo
-import { useQuery, useResult } from '@vue/apollo-composable'
-import getLatestBlockInfo from './apollo/BlockStats/blockStats.graphql'
+import { useResult } from '@vue/apollo-composable'
+import { useGetLatestBlockInfoQuery } from './apollo/BlockStats/blockStats.generated'
 import { useBlockSubscription } from '@/core/mixins/newBlock.mixin'
 
 import BN from 'bignumber.js'
@@ -38,7 +38,7 @@ import BN from 'bignumber.js'
 // Component imports
 import BlockStatsCard from './components/BlockStatsCard.vue'
 
-const { result: blockInfo, error, onResult, loading, refetch } = useQuery(getLatestBlockInfo)
+const { result: blockInfo, error, onResult, loading, refetch } = useGetLatestBlockInfoQuery()
 const { onNewBlockLoaded } = useBlockSubscription()
 
 const blockNumber = useResult(blockInfo, null, data => new BN(data.getLatestBlockInfo.number).toFormat())
