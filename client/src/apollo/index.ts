@@ -72,7 +72,14 @@ const link = split(
     httpLink
 )
 
-const cache = new InMemoryCache()
+const cache = new InMemoryCache({
+    typePolicies: {
+        BlockSummary: {
+            // Define the key to be used for merging when using subscribeToMore
+            keyFields: ['number']
+        }
+    }
+})
 
 const apolloClient = new ApolloClient({
     link,

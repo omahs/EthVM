@@ -1,0 +1,154 @@
+<template>
+    <v-container class="pa-0">
+        <v-layout d-block>
+            <!--
+      =====================================================================================
+        Mobile (XS-SM)
+      =====================================================================================
+      -->
+            <v-flex xs12 v-if="!mdAndUp">
+                <div class="table-row-mobile">
+                    <v-layout grid-list-xs row wrap align-center justify-start fill-height class="pt-3 pb-3 pr-4 pl-4">
+                        <v-flex xs6 pa-1>
+                            <router-link :to="`/block/number/${block.number}`" class="black--text font-weight-medium pb-1">
+                                Block # {{ _block.number }}
+                            </router-link>
+                        </v-flex>
+                        <v-flex xs6 pr-44>
+                            <v-layout row justify-end>
+                                <p class="black--text align-center pl-2">
+                                    {{ _block.totalTx }} Txs
+                                    <app-tooltip v-if="_block.txFail > 0" :text="txTooltipText" />
+                                </p>
+                            </v-layout>
+                        </v-flex>
+                        <v-flex xs2 pa-1>
+                            <p class="info--text psmall">Age:</p>
+                        </v-flex>
+                        <v-flex xs10 pa-1>
+                            {{ _block.timestamp }}
+                        </v-flex>
+                        <v-flex xs2 pa-1>
+                            <p class="info--text psmall pr-1">Miner:</p>
+                        </v-flex>
+                        <v-flex xs10 pa-1>
+                            <app-transform-hash :hash="_block.miner" :italic="true" :link="`/address/${_block.miner}`" />
+                        </v-flex>
+                        <v-flex xs2 pa-1>
+                            <p class="info--text psmall">Reward:</p>
+                        </v-flex>
+                        <v-flex xs10 pa-1>
+                            <p class="black--text align-center pl-2">
+                                {{ _block.rewards.value }}
+                                <app-tooltip v-if="_block.rewards.tooltipText" :text="`${_block.rewards.tooltipText} ETH`" />
+                            </p>
+                        </v-flex>
+                    </v-layout>
+                </div>
+            </v-flex>
+            <!--
+      =====================================================================================
+        Tablet/ Desktop (SM - XL)
+      =====================================================================================
+      -->
+            <v-row v-else sm="12" class="pt-2">
+                <!--
+        =====================================================================================
+          Block Info
+        =====================================================================================
+        -->
+                <!-- <v-col grid-list-xs row wrap align-center justify-start fill-height pl-3 pr-2 pt-2 pb-1> -->
+                <v-col sm="2">
+                    <router-link :to="`/block/number/${block.number}`" class="black--text pb-1">{{ _block.number }}</router-link>
+                </v-col>
+                <v-col sm="5">
+                    <v-row>
+                        <v-col row align-center pb-2 sm="12">
+                            <p class="info--text pr-1">Miner:</p>
+                            <app-transform-hash :hash="_block.miner" :italic="true" :link="`/address/${_block.miner}`" />
+                        </v-col>
+                        <v-col row sm="12">
+                            <p class="info--text psmall pr-2">Age:</p>
+                            {{ _block.timestamp }}
+                        </v-col>
+                    </v-row>
+                </v-col>
+                <v-spacer v-if="!xl" />
+                <v-col sm="2">
+                    <p class="pr-1">
+                        {{ _block.totalTx }}
+                        <app-tooltip v-if="_block.txFail > 0" :text="txTooltipText" />
+                    </p>
+                </v-col>
+                <v-col sm="2">
+                    <p class="black--text align-center mb-0">
+                        {{ _block.rewards }}
+                        <!-- <app-tooltip v-if="_block.rewards.tooltipText" :text="`${_block.rewards.tooltipText} ETH`" /> -->
+                    </p>
+                </v-col>
+                <!-- </v-col> -->
+                <v-col sm="12">
+                    <v-divider class="mb-2 mt-2" />
+                </v-col>
+            </v-row>
+        </v-layout>
+    </v-container>
+</template>
+
+<script setup lang="ts">
+import AppTransformHash from '@core/components/ui/AppTransformHash.vue'
+// import { NumberFormatMixin } from '@app/core/components/mixins/number-format.mixin'
+// import AppTimeAgo from '@app/core/components/ui/AppTimeAgo.vue'
+
+import BN from 'bignumber.js'
+
+import AppTooltip from '@/core/components/ui/AppTooltip.vue'
+import { computed } from 'vue'
+import { useDisplay } from 'vuetify/lib/framework.mjs'
+
+const { mdAndUp, xl } = useDisplay()
+
+const props = defineProps({
+    block: Object
+})
+
+const _block = computed(() => {
+    return {
+        number: props.block.number,
+        miner: props.block.miner,
+        rewards: new BN(props.block.rewards.total).toExponential(4),
+        timestamp: new Date(props.block.timestamp * 1e3),
+        totalTx: props.block.txCount,
+        txFail: props.block.txFail,
+        txSuccess: props.block.txCount - props.block.txFail
+    }
+})
+
+const tooltipText = computed(() => {
+    return `${_block.value.txSuccess} Successful Tx, ${_block.value.txFail} Failed Tx}`
+})
+</script>
+
+<style scoped lang="css">
+.table-row-mobile {
+    border: 1px solid #b4bfd2;
+}
+
+p {
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+}
+.arrow {
+    position: relative;
+}
+
+.line {
+    border-left: 1px solid #b4bfd2;
+    border-bottom: 1px solid #b4bfd2;
+    height: 50px;
+    width: 105%;
+    position: absolute;
+    margin-left: 2px;
+    margin-bottom: 10px;
+}
+</style>
