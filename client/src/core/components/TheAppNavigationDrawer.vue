@@ -1,5 +1,5 @@
 <template>
-    <v-navigation-drawer color="primary" v-model="state.drawer" permanent>
+    <v-navigation-drawer color="primary" v-model="state.drawer">
         <v-row dense justify="center" align="center">
             <v-col cols="2">
                 <v-img :src="require('@/assets/logo-compact.svg')" height="30px" width="30px" contain class="mx-auto" />
@@ -30,25 +30,24 @@
             </template>
         </v-list>
     </v-navigation-drawer>
-
-    <v-app-bar color="white">
-        <v-container>
-            <v-app-bar-title>Harmony Prototype</v-app-bar-title>
-        </v-container>
-        <v-btn color="primary" @click.stop="state.drawer = !state.drawer"> Open Menu </v-btn>
-    </v-app-bar>
+    <the-app-header @open-drawer="openDrawer" />
 </template>
 
 <script setup lang="ts">
 import { reactive } from 'vue'
 import { ROUTE_NAME } from '../router/routesNames'
-
+/* COMPONENTS */
+import TheAppHeader from './TheAppHeader.vue'
 /*
   ===================================================================================
     Initial Data
   ===================================================================================
   */
 const state = reactive({ drawer: true })
+
+const openDrawer = () => {
+    state.drawer = !state.drawer
+}
 
 /**
  * Nav Items
