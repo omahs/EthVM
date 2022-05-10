@@ -39,7 +39,13 @@ import TableBlocks from '@/modules/block/components/RecentBlocks/BlocksTable.vue
 // import AppPaginate from '@app/core/components/ui/AppPaginate.vue'
 // import NoticeNewBlock from '@app/modules/blocks/components/NoticeNewBlock.vue'
 import BN from 'bignumber.js'
-import { useGetBlocksArrayByNumberQuery, GetBlocksArrayByNumberQuery as TypeBlocks, NewBlockTableDocument } from './apollo/RecentBlocks/recentBlocks.generated'
+import {
+    useGetBlocksArrayByNumberQuery,
+    GetBlocksArrayByNumberQuery as TypeBlocks,
+    NewBlockTableDocument,
+    GetBlocksArrayByNumberQuery,
+    NewBlockTableSubscription
+} from './apollo/RecentBlocks/recentBlocks.generated'
 // import { getBlocksArrayByNumber, newBlockTable } from './recentBlocks.graphql'
 // import { getBlocksArrayByNumber_getBlocksArrayByNumber as TypeBlocks } from './apolloTypes/getBlocksArrayByNumber'
 // import { ErrorMessageBlock } from './model/ErrorMessagesForBlock'
@@ -119,28 +125,32 @@ const {
     limit: props.maxItems
 })
 
-subscribeToMore(() => ({
-    document: NewBlockTableDocument,
-    updateQuery: (previousResult, { subscriptionData }) => {
-        if (previousResult && subscriptionData.data.newBlockFeed) {
-            const prevB = [...previousResult.getBlocksArrayByNumber.slice(0)]
-            const newB = subscriptionData.data.newBlockFeed
-            newB.txFail = 0
-            const index = prevB.findIndex(block => block.number === newB.number)
-            if (index != -1) {
-                prevB.splice(index, 1, newB)
+subscribeToMore(xyz)
+
+function xyz() {
+    return {
+        document: NewBlockTableDocument,
+        updateQuery: (previousResult: GetBlocksArrayByNumberQuery, { subscriptionData }: { subscriptionData: NewBlockTableSubscription }) => {
+            if (previousResult && subscriptionData.data.newBlockFeed) {
+                const prevB = [...previousResult.getBlocksArrayByNumber.slice(0)]
+                const newB = subscriptionData.data.newBlockFeed
+                newB.txFail = 0
+                const index = prevB.findIndex(block => block?.number === newB.number)
+                if (index != -1) {
+                    prevB.splice(index, 1, newB)
+                    return {
+                        __typename: 'BlockSummary',
+                        getBlocksArrayByNumber: prevB
+                    }
+                }
                 return {
                     __typename: 'BlockSummary',
-                    getBlocksArrayByNumber: prevB
+                    getBlocksArrayByNumber: [newB, ...prevB]
                 }
-            }
-            return {
-                __typename: 'BlockSummary',
-                getBlocksArrayByNumber: [newB, ...prevB]
             }
         }
     }
-}))
+}
 
 onBlockArrayLoaded(result => {
     if (initialLoad.value) {

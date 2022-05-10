@@ -11,7 +11,7 @@
       TABLE HEADER
     =====================================================================================
     -->
-        <v-row hidden-sm-and-down sm12 class="my-0">
+        <v-row v-if="!smAndDown" sm12 class="my-0">
             <v-col>
                 <v-card v-if="!hasMessage" color="info" flat class="white--text pl-3 table-blocks-header-card" height="40px">
                     <v-row fill-height pr-3>
@@ -57,8 +57,11 @@
 import AppFootnotes from '@/core/components/ui/AppFootnotes.vue'
 import TableBlocksRow from '@/modules/block/components/RecentBlocks/BlocksTableRow.vue'
 import AppTableRowLoading from '@/core/components/ui/AppTableRowLoading.vue'
+import { useDisplay } from 'vuetify/lib/framework.mjs'
 import { computed } from 'vue'
 const SCROLLVIEW = 'max-height: 450px'
+
+const { smAndDown } = useDisplay()
 
 const props = defineProps({
     blockData: Array,
