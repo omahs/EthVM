@@ -1,10 +1,6 @@
 <template>
     <v-app>
-        <v-app-bar color="primary" density="compact">
-            <v-container>
-                <v-app-bar-title>Harmony Prototype</v-app-bar-title>
-            </v-container>
-        </v-app-bar>
+        <the-app-navigation-drawer />
         <v-main>
             <router-view />
         </v-main>
@@ -15,5 +11,6 @@
 import { provide } from 'vue'
 import { ApolloClients } from '@vue/apollo-composable'
 import clients from './apollo'
+import TheAppNavigationDrawer from '@core/components/TheAppNavigationDrawer.vue'
 provide(ApolloClients, clients)
 </script>
