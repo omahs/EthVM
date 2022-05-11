@@ -1,22 +1,38 @@
 <template>
-    <v-card color="transparent" flat max-width="340">
+    <v-card color="transparent" flat>
         <v-container grid-list-xs pa-1>
-            <v-layout row align-center justify-end fill-height>
+            <v-row row align="center" justify="end" fill-height class="flex-nowrap">
                 <!--
                 =====================================================================================
                   First Item Button
                 =====================================================================================
                 -->
-                <v-btn :disabled="currentPage === 0" flat class="bttnGrey info--text text-capitalize bttn" small @click="setPageOnClick('first')"
-                ><v-icon class="secondary--text fas fa-angle-double-left" small />
+                <v-btn
+                    variant="outlined"
+                    color="primary"
+                    :disabled="currentPage === 0"
+                    flat
+                    class="bttnGrey info--text text-capitalize bttn"
+                    small
+                    @click="setPageOnClick('first')"
+                >
+                    <v-icon class="secondary--text fas fa-angle-double-left" small>mdi-chevron-double-left</v-icon>
                 </v-btn>
                 <!--
                 =====================================================================================
                   Prev Item Button
                 =====================================================================================
                 -->
-                <v-btn :disabled="currentPage === 0" flat class="bttnGrey info--text text-capitalize bttn" small @click="setPageOnClick('prev')"
-                ><v-icon class="secondary--text fas fa-angle-left" small />
+                <v-btn
+                    variant="outlined"
+                    color="primary"
+                    :disabled="currentPage === 0"
+                    flat
+                    class="bttnGrey info--text text-capitalize bttn"
+                    small
+                    @click="setPageOnClick('prev')"
+                >
+                    <v-icon class="secondary--text fas fa-angle-left" small>mdi-chevron-left</v-icon>
                 </v-btn>
                 <!--
                 =====================================================================================
@@ -25,11 +41,15 @@
                 -->
                 <div class="pb-1 page-input">
                     <v-text-field
+                        variant="underlined"
+                        density="compact"
+                        :hide-details="true"
+                        single-line
                         v-model="pageDisplay"
                         :mask="inputMask"
                         :placeholder="pageDisplay"
                         :error="!isValidPageDisplay"
-                        :class="[validClass, inputWidthClass, 'centered-input']"
+                        :class="[state.validClass, inputWidthClass, 'centered-input']"
                     />
                 </div>
                 <!--
@@ -37,11 +57,11 @@
                   Total Pages Text
                 =====================================================================================
                 -->
-                <v-tooltip v-if="hasTotalTooltip" color="white" content-class="tooltip-border" top>
-                    <template #activator="{on}">
-                        <p class="info--text text-center total-p caption pl-1" v-on="on">{{ showText }}</p>
+                <v-tooltip v-if="hasTotalTooltip" color="white" content-class="tooltip-border" anchor="top">
+                    <template #activator="{ props }">
+                        <p class="info--text text-center total-p caption pl-1" v-bind="props">{{ showText }}</p>
                     </template>
-                    <span class="black--text">{{ $t('message.page') }} {{ hasTotalTooltip }}</span>
+                    <span class="black--text">of {{ hasTotalTooltip }}</span>
                 </v-tooltip>
                 <p v-else class="info--text text-center total-p caption pl-1">{{ showText }}</p>
                 <!--
@@ -49,25 +69,39 @@
                   Next Item Button
                 =====================================================================================
                 -->
-                <v-btn :disabled="currentPage === lastPage" flat class="bttnGrey info--text text-capitalize bttn" small @click="setPageOnClick('next')"
-                ><v-icon class="secondary--text fas fa-angle-right" small />
+                <v-btn
+                    variant="outlined"
+                    color="primary"
+                    :disabled="currentPage === lastPage"
+                    flat
+                    class="bttnGrey info--text text-capitalize bttn"
+                    small
+                    @click="setPageOnClick('next')"
+                    ><v-icon class="secondary--text fas fa-angle-right" small>mdi-chevron-right</v-icon>
                 </v-btn>
                 <!--
                 =====================================================================================
                   Last Item Button
                 =====================================================================================
                 -->
-                <v-btn :disabled="currentPage === lastPage" flat class="bttnGrey info--text text-capitalize bttn caption" small @click="setPageOnClick('last')"
-                ><v-icon class="secondary--text fas fa-angle-double-right" small />
+                <v-btn
+                    variant="outlined"
+                    color="primary"
+                    :disabled="currentPage === lastPage"
+                    flat
+                    class="bttnGrey info--text text-capitalize bttn caption"
+                    small
+                    @click="setPageOnClick('last')"
+                    ><v-icon class="secondary--text fas fa-angle-double-right" small>mdi-chevron-double-right</v-icon>
                 </v-btn>
-            </v-layout>
+            </v-row>
         </v-container>
     </v-card>
 </template>
 
 <script setup lang="ts">
-import BigNumber from 'bignumber.js'
-import { ref } from 'vue'
+import BN from 'bignumber.js'
+import { reactive, computed } from 'vue'
 
 const emit = defineEmits(['newPage'])
 
@@ -86,9 +120,18 @@ const props = defineProps({
  * REFS
  * =======================================================
  */
-const validClass = ref('center-input body-1 secondary--text')
-const invalidClass = ref('center-input body-1 error--text')
-const isError = ref(false)
+interface Reactive {
+    validClass: string
+    invalidClass: string
+    isError: boolean
+    pageDisplayUpdateTimeout: number | null
+}
+const state: Reactive = reactive({
+    validClass: 'center-input body-1 secondary--text',
+    invalidClass: 'center-input body-1 error--text',
+    isError: false,
+    pageDisplayUpdateTimeout: null
+})
 
 /*
  * =======================================================
@@ -96,197 +139,130 @@ const isError = ref(false)
  * =======================================================
  */
 
-const emitNewPage = (page: number) => {
+const emitNewPage = (page: number): void => {
     emit('newPage', page)
 }
 
-const setPage = (page: number) => {
+const setPage = (page: number): void => {
     if (isValidPage(page) && page != props.currentPage) {
         emitNewPage(page)
     }
 }
 
 const isValidPage = (page: number): boolean => {
-    return page >= 0 && page <= lastPage
+    return page >= 0 && page <= lastPage.value
 }
 
-@Component
-export default class AppPaginate extends Mixins(NumberFormatMixin) {
-    /*
-  ===================================================================================
-    Props
-  ===================================================================================
-  */
-    @Prop(Number) total!: number
-    @Prop(Number) currentPage!: number
-
-    /*
-  ===================================================================================
-    Initial Data
-  ===================================================================================
-  */
-    validClass = 'center-input body-1 secondary--text'
-    invalidClass = 'center-input body-1 error--text'
-    isError = false
-    pageDisplayUpdateTimeout: number | null = null // Timeout object to update page with override of pageDisplay input model
-
-    /*
-  ===================================================================================
-    Methods
-  ===================================================================================
-  */
-
-    /**
-     * Emit event to parent compoent/view with updated page number.
-     *
-     * @param  {Number} - Page to emit to parent
-     */
-    emitNewPage(page: number) {
-        this.$emit('newPage', page)
+const setPageOnClick = (value: string): void => {
+    switch (value) {
+        case 'first':
+            emitNewPage(0)
+            break
+        case 'prev':
+            emitNewPage(Math.max(0, props.currentPage - 1))
+            break
+        case 'next':
+            emitNewPage(Math.min(lastPage.value, props.currentPage + 1))
+            break
+        case 'last':
+            emitNewPage(lastPage.value)
+            break
+        default:
+            break
     }
+}
 
-    /**
-     * If desired page is within valid page range, emit new page.
-     *
-     * @param {Number} page - Desired page to traverse
-     */
-    setPage(page: number) {
-        if (this.isValidPage(page) && page !== this.currentPage) {
-            this.emitNewPage(page)
-        }
-    }
-
-    /**
-     * On pagination button click, emit updated page number to parent component/view
-     *
-     * @param {String} value - Name of action to perform
-     */
-    setPageOnClick(value: string): void {
-        switch (value) {
-            case 'first':
-                this.emitNewPage(0)
-                break
-            case 'prev':
-                this.emitNewPage(Math.max(0, this.currentPage - 1))
-                break
-            case 'next':
-                this.emitNewPage(Math.min(this.lastPage, this.currentPage + 1))
-                break
-            case 'last':
-                this.emitNewPage(this.lastPage)
-                break
-            default:
-                break
-        }
-    }
-
-    /**
-     * Determine if a given @number is within the valid page range.
-     *
-     * @page {Number} - Page number to be validated
-     * @return {Boolean}
-     */
-    isValidPage(page: number): boolean {
-        return page >= 0 && page <= this.lastPage
-    }
-
-    /*
-  ===================================================================================
-    Set Values
-  ===================================================================================
-  */
-
-    set pageDisplay(pageDisplay: string) {
-        const desiredPage = parseInt(pageDisplay, 10) - 1
-        ;(desiredPage >= 0 && desiredPage <= this.lastPage) || !pageDisplay ? (this.isError = false) : (this.isError = true)
-        if (this.pageDisplayUpdateTimeout) {
-            clearTimeout(this.pageDisplayUpdateTimeout)
-        }
-        this.pageDisplayUpdateTimeout = window.setTimeout(() => {
-            this.setPage(desiredPage)
-        }, 1000)
-    }
-
-    /*
-  ===================================================================================
-    Computed Values
-  ===================================================================================
-  */
-
-    /**
-     * Returns Text for the total pages near the input
-     *
-     * @returns {string}
-     */
-    get showText(): string {
-        return `${this.$t('message.page')} ${this.formatIntegerValue(new BigNumber(this.total), true).value}`
-    }
-
+/*
+ * =======================================================
+ * COMPUTED
+ * =======================================================
+ */
+const pageDisplay = computed({
     /**
      * Transform the "zero-based" value of this.page into
      * a human-readable string that starts from 1 as opposed to 0
      * @returns {string}
      */
-    get pageDisplay(): string {
-        return new BigNumber(this.currentPage + 1).toFixed()
-    }
-
-    /**
-     * Determine if an given @number is within the valid page range.
-     *
-     * @return {Boolean}
-     */
-    get isValidPageDisplay(): boolean {
-        return !this.isError
-    }
-
-    /**
-     * Display tooltip if totalPages >= 1k
-     *
-     * @return {string | undefined} - string IF totalPages >= 1k, undefined otherwise
-     */
-    get hasTotalTooltip(): string | undefined {
-        return this.total >= 1e3 ? this.formatNumber(this.total) : undefined
-    }
-
-    /**
-     * Property this.total is a human-readable number/length as opposed to a zero-based number.
-     * The last possible page is zero-based, so this translates the human-readable number into zero-based
-     *
-     * @returns {number}
-     */
-    get lastPage(): number {
-        return this.total - 1
-    }
-
-    get inputMask(): string {
-        let mask = '#'
-        while (mask.length != this.total.toString().length) {
-            mask += '#'
+    get() {
+        return new BN(props.currentPage + 1).toFixed()
+    },
+    set(pageDisplay: string) {
+        const desiredPage = parseInt(pageDisplay, 10) - 1
+        console.log('desiredPage', desiredPage)
+        ;(desiredPage >= 0 && desiredPage <= lastPage.value) || !pageDisplay ? (state.isError = false) : (state.isError = true)
+        if (state.pageDisplayUpdateTimeout) {
+            clearTimeout(state.pageDisplayUpdateTimeout)
         }
-        return mask
+        state.pageDisplayUpdateTimeout = window.setTimeout(() => {
+            setPage(desiredPage)
+        }, 1000)
+    }
+})
+
+/**
+ * Returns Text for the total pages near the input
+ *
+ * @returns {string}
+ */
+const showText = computed<string>(() => {
+    return `of ${new BN(props.total).toFormat()}`
+})
+
+/**
+ * Determine if an given @number is within the valid page range.
+ *
+ * @return {Boolean}
+ */
+const isValidPageDisplay = computed<boolean>(() => {
+    return !state.isError
+})
+
+/**
+ * Display tooltip if totalPages >= 1k
+ *
+ * @return {string | undefined} - string IF totalPages >= 1k, undefined otherwise
+ */
+const hasTotalTooltip = computed<string | undefined>(() => {
+    return props.total >= 1e3 ? new BN(props.total).toFormat() : undefined
+})
+
+/**
+ * Property this.total is a human-readable number/length as opposed to a zero-based number.
+ * The last possible page is zero-based, so this translates the human-readable number into zero-based
+ *
+ * @returns {number}
+ */
+const lastPage = computed<number>(() => {
+    return props.total - 1
+})
+
+const inputMask = computed<string>(() => {
+    let mask = '#'
+    while (mask.length != props.total.toString().length) {
+        mask += '#'
+    }
+    return mask
+})
+
+/**
+ * Returns Class name of the input width
+ * Determines width of the input accordign to the total page size
+ *
+ * @returns {string}
+ */
+const inputWidthClass = computed<string>(() => {
+    if (props.total.toString().length < 3) {
+        return 'x-sm'
+    }
+    if (props.total.toString().length < 6) {
+        return 'sm'
+    }
+    if (props.total.toString().length < 9) {
+        return 'md'
     }
 
-    /**
-     * Returns Class name of the input width
-     * Determines width of the input accordign to the total page size
-     *
-     * @returns {string}
-     */
-    get inputWidthClass(): string {
-        if (this.total.toString().length < 3) {
-            return 'x-sm'
-        }
-        if (this.total.toString().length < 6) {
-            return 'sm'
-        }
-        if (this.total.toString().length < 9) {
-            return 'md'
-        }
-
-        return 'lg'
-    }
-}
+    return 'lg'
+})
 </script>
 
 <style scoped lang="scss">
@@ -317,4 +293,3 @@ p {
     white-space: nowrap;
 }
 </style>
-

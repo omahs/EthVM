@@ -54,7 +54,6 @@
 </template>
 
 <script setup lang="ts">
-import AppFootnotes from '@/core/components/ui/AppFootnotes.vue'
 import TableBlocksRow from '@/modules/block/components/RecentBlocks/BlocksTableRow.vue'
 import AppTableRowLoading from '@/core/components/ui/AppTableRowLoading.vue'
 import { useDisplay } from 'vuetify/lib/framework.mjs'

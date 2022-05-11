@@ -3,41 +3,34 @@
         <v-card color="white" flat class="pt-3 pb-3">
             <v-container>
                 <app-table-title :title="getTitle" :has-pagination="showPagination" :page-type="pageType" page-link="/blocks">
-                    <!-- <template v-if="!isHome" #update>
+                    <template v-if="!isHome" #update>
                         <notice-new-block @reload="setPage(0, true)" />
-                    </template> -->
-                    <!-- <template v-if="showPagination && !initialLoad" #pagination>
-                        <app-paginate :total="totalPages" :current-page="currentPage" @newPage="setPage" /> </template -->
-                    ></app-table-title
-                >
+                    </template>
+                    <template v-if="showPagination && !state.initialLoad" #pagination>
+                        <app-paginate :total="state.totalPages" :current-page="currentPage" @newPage="setPage" />
+                    </template>
+                </app-table-title>
                 <table-blocks
                     :max-items="maxItems"
-                    :index="index"
+                    :index="state.index"
                     :is-loading="loading"
                     :table-message="message"
                     :block-data="blocks"
                     :is-scroll-view="isHome"
                 />
-                <!-- <v-layout
-                    v-if="showPagination && !initialLoad"
-                    :justify-end="$vuetify.breakpoint.mdAndUp"
-                    :justify-center="$vuetify.breakpoint.smAndDown"
-                    row
-                    class="pb-1 pr-3 pl-2"
-                >
-                    <app-paginate :total="totalPages" :current-page="currentPage" @newPage="setPage" />
-                </v-layout> -->
+                <v-row v-if="showPagination && !state.initialLoad" justify="end" row class="pb-1 pr-3 pl-2">
+                    <app-paginate :total="state.totalPages" :current-page="currentPage" @newPage="setPage" />
+                </v-row>
             </v-container>
         </v-card>
     </v-container>
 </template>
 
 <script setup lang="ts">
-import { useResult } from '@vue/apollo-composable'
 import AppTableTitle from '@/core/components/ui/AppTableTitle.vue'
 import TableBlocks from '@/modules/block/components/RecentBlocks/BlocksTable.vue'
-// import AppPaginate from '@app/core/components/ui/AppPaginate.vue'
-// import NoticeNewBlock from '@app/modules/blocks/components/NoticeNewBlock.vue'
+import AppPaginate from '@/core/components/ui/AppPaginate.vue'
+import NoticeNewBlock from '@/modules/block/components/RecentBlocks/NoticeNewBlock.vue'
 import BN from 'bignumber.js'
 import {
     useGetBlocksArrayByNumberQuery,
@@ -46,24 +39,31 @@ import {
     GetBlocksArrayByNumberQuery,
     NewBlockTableSubscription
 } from './apollo/RecentBlocks/recentBlocks.generated'
-// import { getBlocksArrayByNumber, newBlockTable } from './recentBlocks.graphql'
-// import { getBlocksArrayByNumber_getBlocksArrayByNumber as TypeBlocks } from './apolloTypes/getBlocksArrayByNumber'
-// import { ErrorMessageBlock } from './model/ErrorMessagesForBlock'
-// import { excpInvariantViolation } from '@/apollo/errorExceptions'
+import { computed, reactive, onMounted } from 'vue'
 
-import { ref, computed } from 'vue'
 interface BlockMap {
     [key: number]: TypeBlocks
 }
 
-const initialLoad = ref(true)
-const hasError = ref(false)
-const syncing = ref(false)
-// const getBlocksArrayByNumber = ref() !: TypeBlocks
-const indexedBlocks = ref<BlockMap>({})
-const index = ref(0)
-const totalPages = ref(0)
-const startBlock = ref<number>()
+interface Reactive {
+    initialLoad: boolean
+    hasError: boolean
+    syncing: boolean
+    indexedBlocks: BlockMap
+    index: number
+    totalPages: number
+    startBlock: number
+}
+
+const state: Reactive = reactive({
+    initialLoad: true,
+    hasError: false,
+    syncing: false,
+    indexedBlocks: {},
+    index: 0,
+    totalPages: 0,
+    startBlock: 0
+})
 
 const props = defineProps({
     maxItems: Number,
@@ -73,9 +73,14 @@ const props = defineProps({
     }
 })
 
+/*
+ * =======================================================
+ * COMPUTED
+ * =======================================================
+ */
 const blocks = computed<TypeBlocks | []>(() => {
-    if (indexedBlocks.value && indexedBlocks.value[index.value]) {
-        return indexedBlocks.value[index.value]
+    if (state.indexedBlocks && state.indexedBlocks[state.index]) {
+        return state.indexedBlocks[state.index]
     }
     return []
 })
@@ -94,11 +99,11 @@ const getTitle = computed<string>(() => {
 })
 
 const loading = computed<boolean>(() => {
-    if (hasError.value) {
+    if (state.hasError) {
         return true
     }
     if (isHome.value) {
-        return initialLoad.value
+        return state.initialLoad
     }
     return loadingBlocks.value
 })
@@ -108,26 +113,32 @@ const isHome = computed<boolean>(() => {
 })
 
 const currentPage = computed<number>(() => {
-    return index.value
+    return state.index
 })
 
 const showPagination = computed<boolean>(() => {
-    return !initialLoad.value && !isHome.value && startBlock.value - props.maxItems > 0
+    return !state.initialLoad && !isHome.value && state.startBlock - props.maxItems > 0
 })
 
+/*
+ * =======================================================
+ * NETWORK CALLS/HANDLER
+ * =======================================================
+ */
 const {
-    result,
     loading: loadingBlocks,
     onResult: onBlockArrayLoaded,
     subscribeToMore,
-    refetch: refetchBlockArray
-} = useGetBlocksArrayByNumberQuery({
-    limit: props.maxItems
-})
+    refetch: refetchBlockArray,
+    fetchMore
+} = useGetBlocksArrayByNumberQuery(
+    {
+        limit: props.maxItems
+    },
+    { notifyOnNetworkStatusChange: true }
+)
 
-subscribeToMore(xyz)
-
-function xyz() {
+function subscribeToMoreHandler() {
     return {
         document: NewBlockTableDocument,
         updateQuery: (previousResult: GetBlocksArrayByNumberQuery, { subscriptionData }: { subscriptionData: NewBlockTableSubscription }) => {
@@ -153,8 +164,11 @@ function xyz() {
 }
 
 onBlockArrayLoaded(result => {
-    if (initialLoad.value) {
-        initialLoad.value = false
+    if (state.initialLoad) {
+        state.initialLoad = false
+        state.startBlock = result.data.getBlocksArrayByNumber[0].number
+        state.index = 0
+        state.totalPages = Math.ceil(new BN(state.startBlock + 1).div(props.maxItems).toNumber())
     }
     if (props.pageType === 'home') {
         if (result.data.getBlocksArrayByNumber[0].number - result.data.getBlocksArrayByNumber[1].number > 1) {
@@ -163,7 +177,41 @@ onBlockArrayLoaded(result => {
         }
     }
     const newBlocks = result.data.getBlocksArrayByNumber
-    indexedBlocks.value[index.value] = props.pageType === 'home' ? newBlocks.slice(0, props.maxItems) : newBlocks
+    state.indexedBlocks[state.index] = props.pageType === 'home' ? newBlocks.slice(0, props.maxItems) : newBlocks
+})
+
+/*
+ * =======================================================
+ * METHODS
+ * =======================================================
+ */
+const setPage = async (page: number, reset = false): Promise<boolean> => {
+    state.index = page
+    if (reset) {
+        state.indexedBlocks = {}
+        state.initialLoad = true
+        await refetchBlockArray()
+    } else {
+        const from = state.startBlock - props.maxItems * state.index
+        if (from >= 0 && !state.indexedBlocks[state.index]) {
+            await fetchMore({
+                variables: {
+                    fromBlock: from,
+                    limit: props.maxItems
+                },
+                updateQuery: (previousResult, { fetchMoreResult }) => {
+                    return fetchMoreResult
+                }
+            })
+        }
+    }
+    return true
+}
+
+onMounted(() => {
+    if (isHome.value) {
+        subscribeToMore(subscribeToMoreHandler)
+    }
 })
 </script>
 <style scoped lang="css">

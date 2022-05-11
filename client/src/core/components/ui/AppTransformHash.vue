@@ -13,9 +13,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
-
-const $router = useRouter()
 
 const props = defineProps({
     hash: String,
@@ -43,12 +40,6 @@ const end = computed<string>(() => {
 const hasLink = computed<boolean>(() => {
     return !!props.link && props.link !== ''
 })
-
-// const routeTo = () => {
-//     if (props.link) {
-//         $router.push(props.link).catch(() => {})
-//     }
-// }
 </script>
 
 <style scoped lang="scss">
