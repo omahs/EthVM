@@ -188,7 +188,6 @@ const pageDisplay = computed({
     },
     set(pageDisplay: string) {
         const desiredPage = parseInt(pageDisplay, 10) - 1
-        console.log('desiredPage', desiredPage)
         ;(desiredPage >= 0 && desiredPage <= lastPage.value) || !pageDisplay ? (state.isError = false) : (state.isError = true)
         if (state.pageDisplayUpdateTimeout) {
             clearTimeout(state.pageDisplayUpdateTimeout)
