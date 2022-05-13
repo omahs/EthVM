@@ -38,7 +38,7 @@ import BN from 'bignumber.js'
 // Component imports
 import BlockStatsCard from './components/BlockStatsCard.vue'
 
-const { result: blockInfo, error, onResult, loading, refetch } = useGetLatestBlockInfoQuery()
+const { result: blockInfo, loading, refetch } = useGetLatestBlockInfoQuery()
 const { onNewBlockLoaded } = useBlockSubscription()
 
 const blockNumber = useResult(blockInfo, null, data => new BN(data.getLatestBlockInfo.number).toFormat())

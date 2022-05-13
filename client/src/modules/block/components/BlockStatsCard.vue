@@ -17,10 +17,8 @@
 </template>
 <script setup lang="ts">
 import { defineProps, computed, onMounted, ref, watch } from 'vue'
-import { log } from 'util'
 
 // refs
-const currentDate = ref(new Date())
 const timeFrom = ref(0)
 let interval
 
