@@ -1,7 +1,8 @@
 module.exports = {
     root: true,
     env: {
-        node: true
+        node: true,
+        'vue/setup-compiler-macros': true
     },
     extends: ['../.eslintrc.js', 'plugin:vue/vue3-essential', '@vue/typescript/recommended'],
     rules: {

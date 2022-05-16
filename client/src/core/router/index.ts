@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 import { ROUTE_NAME } from './routesNames'
 import HomeView from '@view/HomeView.vue'
+import BlocksView from '@view/BlocksView.vue'
 import ViewTemp from '@view/ViewTemp.vue'
 const routes: Array<RouteRecordRaw> = [
     {
@@ -11,7 +12,7 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: ROUTE_NAME.BLOCKS.PATH,
         name: ROUTE_NAME.BLOCKS.NAME,
-        component: ViewTemp
+        component: BlocksView
     },
     {
         path: ROUTE_NAME.TXS.PATH,
