@@ -1,25 +1,25 @@
 <template>
     <v-container>
-        <v-card color="white" flat class="pt-3 pb-3">
+        <v-card color="white" variant="contained-flat" class="pt-3 pb-3">
             <v-container>
-                <app-table-title :title="getTitle" :has-pagination="showPagination" :page-type="pageType" page-link="/blocks">
+                <app-table-title :title="getTitle" :has-pagination="showPagination" :page-type="pageType" page-link="/txs">
                     <template v-if="!isHome" #update>
-                        <notice-new-block @reload="setPage(0, true)" />
+                        <app-new-update text="New Txs" :update-count="state.newMinedTransfers" :hide-count="true" @reload="setPage(0, true)" />
                     </template>
                     <template v-if="showPagination && !state.initialLoad" #pagination>
-                        <app-paginate :total="state.totalPages" :current-page="currentPage" @newPage="setPage" />
+                        <app-paginate-has-more :total="state.totalPages" :current-page="state.index" @newPage="setPage" />
                     </template>
                 </app-table-title>
-                <table-blocks
+                <txs-table
                     :max-items="maxItems"
                     :index="state.index"
                     :is-loading="loading"
                     :table-message="message"
-                    :block-data="blocks"
+                    :txs-data="transactions"
                     :is-scroll-view="isHome"
                 />
                 <v-row v-if="showPagination && !state.initialLoad" justify="end" row class="pb-1 pr-3 pl-2">
-                    <app-paginate :total="state.totalPages" :current-page="currentPage" @newPage="setPage" />
+                    <app-paginate-has-more :has-more="hasMore" :current-page="state.index" :loading="loading" @newPage="setPage" />
                 </v-row>
             </v-container>
         </v-card>
@@ -28,39 +28,29 @@
 
 <script setup lang="ts">
 import AppTableTitle from '@/core/components/ui/AppTableTitle.vue'
-import TableBlocks from '@/modules/block/components/RecentBlocks/BlocksTable.vue'
-import AppPaginate from '@/core/components/ui/AppPaginate.vue'
-import NoticeNewBlock from '@/modules/block/components/RecentBlocks/NoticeNewBlock.vue'
-import BN from 'bignumber.js'
-import {
-    useGetBlocksArrayByNumberQuery,
-    GetBlocksArrayByNumberQuery as TypeBlocks,
-    NewBlockTableDocument,
-    GetBlocksArrayByNumberQuery,
-    NewBlockTableSubscription
-} from './apollo/RecentBlocks/recentBlocks.generated'
-import { computed, reactive, onMounted } from 'vue'
-
-interface BlockMap {
-    [key: number]: TypeBlocks
-}
+import AppNewUpdate from '@/core/components/ui/AppNewUpdate.vue'
+import AppPaginateHasMore from '@/core/components/ui/AppPaginateHasMore.vue'
+import { useGetAllTxsQuery, useNewTransfersCompleteFeedSubscription } from './apollo/transfersQuery.generated'
+import { computed, reactive } from 'vue'
+import { useResult } from '@vue/apollo-composable'
+import TxsTable from '@module/txs/components/TxsTable.vue'
 
 interface Reactive {
     initialLoad: boolean
-    hasError: boolean
-    indexedBlocks: BlockMap
     index: number
     totalPages: number
-    startBlock: number
+    isEnd: number
+    newMinedTransfers: number
+    hasError: boolean
 }
 
 const state: Reactive = reactive({
     initialLoad: true,
-    hasError: false,
-    indexedBlocks: {},
     index: 0,
     totalPages: 0,
-    startBlock: 0
+    isEnd: 0,
+    newMinedTransfers: 0,
+    hasError: false
 })
 
 const props = defineProps({
@@ -76,9 +66,9 @@ const props = defineProps({
  * COMPUTED
  * =======================================================
  */
-const blocks = computed<TypeBlocks | []>(() => {
-    if (state.indexedBlocks && state.indexedBlocks[state.index]) {
-        return state.indexedBlocks[state.index]
+const transactions = computed(() => {
+    if (allEthTransfers.value && allEthTransfers.value.transfers !== null) {
+        return allEthTransfers.value.transfers
     }
     return []
 })
@@ -88,12 +78,7 @@ const message = computed<string>(() => {
 })
 
 const getTitle = computed<string>(() => {
-    const titles = {
-        blocks: 'Last Blocks',
-        address: 'Mined Blocks',
-        home: 'Last Blocks'
-    }
-    return titles[props.pageType]
+    return 'Last Transactions'
 })
 
 const loading = computed<boolean>(() => {
@@ -103,19 +88,26 @@ const loading = computed<boolean>(() => {
     if (isHome.value) {
         return state.initialLoad
     }
-    return loadingBlocks.value
+    return loadingTxs.value
 })
 
 const isHome = computed<boolean>(() => {
     return props.pageType === 'home'
 })
 
-const currentPage = computed<number>(() => {
-    return state.index
+const hasMore = computed<boolean>(() => {
+    if (!isHome.value) {
+        return allEthTransfers.value ? !(allEthTransfers.value.nextKey === null) : false
+    }
+    return false
 })
 
 const showPagination = computed<boolean>(() => {
-    return !state.initialLoad && !isHome.value && state.startBlock - props.maxItems > 0
+    if (isHome.value) {
+        return false
+    }
+
+    return hasMore.value
 })
 
 /*
@@ -124,42 +116,37 @@ const showPagination = computed<boolean>(() => {
  * =======================================================
  */
 const {
-    loading: loadingBlocks,
-    onResult: onBlockArrayLoaded,
-    subscribeToMore,
-    refetch: refetchBlockArray,
+    loading: loadingTxs,
+    result: getAllEthTransfers,
+    onResult: onTxsArrayLoaded,
+    refetch: refetchTxArray,
     fetchMore
-} = useGetBlocksArrayByNumberQuery(
+} = useGetAllTxsQuery(
     {
-        limit: props.maxItems
+        _limit: props.maxItems,
+        _nextKey: null
     },
     { notifyOnNetworkStatusChange: true }
 )
 
-function subscribeToMoreHandler() {
-    return {
-        document: NewBlockTableDocument,
-        updateQuery: (previousResult: GetBlocksArrayByNumberQuery, { subscriptionData }: { subscriptionData: NewBlockTableSubscription }) => {
-            if (previousResult && subscriptionData.data.newBlockFeed) {
-                const prevB = [...previousResult.getBlocksArrayByNumber.slice(0)]
-                const newB = subscriptionData.data.newBlockFeed
-                newB.txFail = 0
-                const index = prevB.findIndex(block => block?.number === newB.number)
-                if (index != -1) {
-                    prevB.splice(index, 1, newB)
-                    return {
-                        __typename: 'BlockSummary',
-                        getBlocksArrayByNumber: prevB
-                    }
-                }
-                return {
-                    __typename: 'BlockSummary',
-                    getBlocksArrayByNumber: [newB, ...prevB]
-                }
-            }
+const { onResult: onNewTransferLoaded } = useNewTransfersCompleteFeedSubscription()
+
+const allEthTransfers = useResult(getAllEthTransfers, null, data => data.getAllEthTransfers)
+
+onTxsArrayLoaded(result => {
+    console.log(result)
+    state.initialLoad = false
+})
+
+onNewTransferLoaded(result => {
+    if (result.data.newTransfersCompleteFeed.type === 'ETH') {
+        if (isHome.value) {
+            refetchTxArray()
+        } else {
+            state.newMinedTransfers += 1
         }
     }
-}
+})
 
 /*
  * =======================================================
@@ -169,48 +156,38 @@ function subscribeToMoreHandler() {
 const setPage = async (page: number, reset = false): Promise<boolean> => {
     state.index = page
     if (reset) {
-        state.indexedBlocks = {}
-        state.initialLoad = true
-        await refetchBlockArray()
+        state.isEnd = 0
+        if (isHome.value) {
+            state.newMinedTransfers = 0
+        }
+        await refetchTxArray()
     } else {
-        const from = state.startBlock - props.maxItems * state.index
-        if (from >= 0 && !state.indexedBlocks[state.index]) {
+        if (page >= state.isEnd && hasMore.value) {
             await fetchMore({
                 variables: {
-                    fromBlock: from,
-                    limit: props.maxItems
+                    nextKey: getAllEthTransfers.nextKey,
+                    _limit: props.maxItems
                 },
                 updateQuery: (previousResult, { fetchMoreResult }) => {
-                    return fetchMoreResult
+                    state.isEnd = page
+                    const newT = fetchMoreResult.getAllEthTransfers.transfers
+                    const prevT = previousResult.getAllEthTransfers.transfers
+                    return {
+                        ...previousResult,
+                        getAllEthTransfers: {
+                            __typename: previousResult.getAllEthTransfers.__typename,
+                            nextKey: fetchMoreResult.getAllEthTransfers.nextKey,
+                            transfers: [...prevT, ...newT]
+                        }
+                    }
                 }
             })
         }
     }
+
+    state.index = page
     return true
 }
-
-onBlockArrayLoaded(result => {
-    if (state.initialLoad) {
-        state.initialLoad = false
-        state.startBlock = result.data.getBlocksArrayByNumber[0].number
-        state.index = 0
-        state.totalPages = Math.ceil(new BN(state.startBlock + 1).div(props.maxItems).toNumber())
-    }
-    if (props.pageType === 'home') {
-        if (result.data.getBlocksArrayByNumber[0].number - result.data.getBlocksArrayByNumber[1].number > 1) {
-            refetchBlockArray()
-        }
-    }
-    const newBlocks = result.data.getBlocksArrayByNumber
-    state.indexedBlocks[state.index] = props.pageType === 'home' ? newBlocks.slice(0, props.maxItems) : newBlocks
-})
-
-onMounted(() => {
-    if (isHome.value) {
-        subscribeToMore(subscribeToMoreHandler)
-    }
-    refetchBlockArray()
-})
 </script>
 <style scoped lang="css">
 .tx-filter-select-container {

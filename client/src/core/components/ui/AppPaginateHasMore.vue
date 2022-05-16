@@ -78,7 +78,7 @@
 
 <script setup lang="ts">
 import BN from 'bignumber.js'
-import { reactive, computed } from 'vue'
+import { reactive, computed, watch } from 'vue'
 
 const emit = defineEmits(['newPage'])
 
@@ -136,7 +136,7 @@ const setPageOnClick = (value: string): void => {
             emitNewPage(Math.max(0, props.currentPage - 1))
             break
         case 'next':
-            emitNewPage(Math.min(lastPage.value, props.currentPage + 1))
+            emitNewPage(props.currentPage + 1)
             break
         case 'last':
             emitNewPage(state.lastPageLoad)
@@ -153,53 +153,17 @@ const setPageOnClick = (value: string): void => {
  */
 
 /**
- * Returns Text for the total pages near the input
- *
- * @returns {string}
+ * Transform the "zero-based" value of this.page into
+ * a human-readable string that starts from 1 as opposed to 0
+ * @return {string}
  */
-const showText = computed<string>(() => {
-    return `of ${new BN(props.total).toFormat()}`
-})
-
-/**
- * Determine if an given @number is within the valid page range.
- *
- * @return {Boolean}
- */
-const isValidPageDisplay = computed<boolean>(() => {
-    return !state.isError
-})
-
-/**
- * Display tooltip if totalPages >= 1k
- *
- * @return {string | undefined} - string IF totalPages >= 1k, undefined otherwise
- */
-const hasTotalTooltip = computed<string | undefined>(() => {
-    return props.total >= 1e3 ? new BN(props.total).toFormat() : undefined
-})
-
-/**
- * Property this.total is a human-readable number/length as opposed to a zero-based number.
- * The last possible page is zero-based, so this translates the human-readable number into zero-based
- *
- * @returns {number}
- */
-const lastPage = computed<number>(() => {
-    return props.total - 1
-})
-
-const inputMask = computed<string>(() => {
-    let mask = '#'
-    while (mask.length != props.total.toString().length) {
-        mask += '#'
-    }
-    return mask
+const textDisplay = computed<string>(() => {
+    return `of ${new BN(props.currentPage + 1).toFormat()}`
 })
 
 /**
  * Returns Class name of the input width
- * Determines width of the input accordign to the total page size
+ * Determines width of the input according to the total page size
  *
  * @returns {string}
  */
@@ -207,10 +171,27 @@ const disableNext = computed<boolean>(() => {
     if (props.loading) {
         return true
     }
-    if (this.hasLast) {
+    if (state.hasLast) {
         return props.currentPage === state.lastPageLoad
     }
     return false
+})
+
+/*
+ * =======================================================
+ * WATCHER
+ * =======================================================
+ */
+watch(props.currentPage, (newVal, oldVal) => {
+    if (newVal > state.lastPageLoad && newVal > oldVal) {
+        state.lastPageLoad = props.currentPage
+    }
+})
+
+watch(props.hasMore, (newVal, oldVal) => {
+    if (!newVal && oldVal) {
+        state.hasLast = true
+    }
 })
 </script>
 
@@ -221,24 +202,12 @@ const disableNext = computed<boolean>(() => {
     margin: 5px;
 }
 
-.x-sm {
-    max-width: 2em;
-}
-.sm {
-    max-width: 3em;
-}
-.md {
-    max-width: 5em;
-}
-.lg {
-    max-width: 8em;
+.page-input {
+    width: 80px;
 }
 
 p {
     margin: 0;
     padding: 0;
-}
-.total-p {
-    white-space: nowrap;
 }
 </style>

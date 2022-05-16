@@ -8,7 +8,6 @@
 
 <script setup lang="ts">
 import { useDisplay } from 'vuetify/lib/framework.mjs'
-import { defineEmits } from 'vue'
 /* Vuetify BreakPoints */
 const { md, xs, sm } = useDisplay()
 /*Define Emit Events */

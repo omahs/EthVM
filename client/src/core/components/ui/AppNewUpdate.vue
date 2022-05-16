@@ -5,7 +5,7 @@
     </v-btn>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { computed } from 'vue'
 import { useDisplay } from 'vuetify/lib/framework.mjs'
 
@@ -40,11 +40,11 @@ const emit = defineEmits(['reload'])
 ===================================================================================
 */
 const display = computed<boolean>(() => {
-    return this.updateCount > 0
+    return props.updateCount > 0
 })
 
 const buttonText = computed<string>(() => {
-    return this.hideCount ? `${props.text}` : `${props.updateCount} ${props.text}`
+    return props.hideCount ? `${props.text}` : `${props.updateCount} ${props.text}`
 })
 
 /*
