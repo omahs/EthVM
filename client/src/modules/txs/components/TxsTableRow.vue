@@ -114,7 +114,7 @@
                     </v-col>
                     <v-col v-if="!isPending" lg="1">
                         <v-icon v-if="transaction.status" small class="txSuccess--text tx-status text-xs-center text-green">mdi-check-circle</v-icon>
-                        <v-icon v-else small class="txFail--text tx-status text-xs-center text-green">mdi-times-circle</v-icon>
+                        <v-icon v-else small class="txFail--text tx-status text-xs-center text-red">mdi-close-circle-outline</v-icon>
                     </v-col>
                     <p v-if="isPending && transaction.isMined" class="caption primary--text blinking">Mined</p>
                 </v-row>

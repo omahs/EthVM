@@ -134,7 +134,6 @@ const { onResult: onNewTransferLoaded } = useNewTransfersCompleteFeedSubscriptio
 const allEthTransfers = useResult(getAllEthTransfers, null, data => data.getAllEthTransfers)
 
 onTxsArrayLoaded(result => {
-    console.log(result)
     state.initialLoad = false
 })
 
