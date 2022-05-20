@@ -36,7 +36,7 @@ import { useBlockSubscription } from '@core/mixins/newBlock.mixin'
 import BN from 'bignumber.js'
 
 // Component imports
-import BlockStatsCard from './components/BlockStatsCard.vue'
+import BlockStatsCard from './components/ModuleBlockStatsCard.vue'
 
 const { result: blockInfo, loading, refetch } = useGetLatestBlockInfoQuery()
 const { onNewBlockLoaded } = useBlockSubscription()
