@@ -123,10 +123,6 @@ const _block = computed(() => {
         txSuccess: props.block.txCount - props.block.txFail
     }
 })
-
-const tooltipText = computed(() => {
-    return `${_block.value.txSuccess} Successful Tx, ${_block.value.txFail} Failed Tx}`
-})
 </script>
 
 <style scoped lang="css">

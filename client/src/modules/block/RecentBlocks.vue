@@ -190,19 +190,21 @@ const setPage = async (page: number, reset = false): Promise<boolean> => {
 }
 
 onBlockArrayLoaded(result => {
-    if (state.initialLoad) {
-        state.initialLoad = false
-        state.startBlock = result.data.getBlocksArrayByNumber[0].number
-        state.index = 0
-        state.totalPages = Math.ceil(new BN(state.startBlock + 1).div(props.maxItems).toNumber())
-    }
-    if (props.pageType === 'home') {
-        if (result.data.getBlocksArrayByNumber[0].number - result.data.getBlocksArrayByNumber[1].number > 1) {
-            refetchBlockArray()
+    if (!result.loading) {
+        if (state.initialLoad) {
+            state.initialLoad = false
+            state.startBlock = result.data.getBlocksArrayByNumber[0].number
+            state.index = 0
+            state.totalPages = Math.ceil(new BN(state.startBlock + 1).div(props.maxItems).toNumber())
         }
+        if (props.pageType === 'home') {
+            if (result.data.getBlocksArrayByNumber[0].number - result.data.getBlocksArrayByNumber[1].number > 1) {
+                refetchBlockArray()
+            }
+        }
+        const newBlocks = result.data.getBlocksArrayByNumber
+        state.indexedBlocks[state.index] = props.pageType === 'home' ? newBlocks.slice(0, props.maxItems) : newBlocks
     }
-    const newBlocks = result.data.getBlocksArrayByNumber
-    state.indexedBlocks[state.index] = props.pageType === 'home' ? newBlocks.slice(0, props.maxItems) : newBlocks
 })
 
 onMounted(() => {

@@ -16,7 +16,7 @@
     </v-card>
 </template>
 <script setup lang="ts">
-import { defineProps, computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 // refs
 const timeFrom = ref(0)

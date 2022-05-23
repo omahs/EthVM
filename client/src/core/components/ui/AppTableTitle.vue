@@ -1,17 +1,17 @@
 <template>
     <div>
-        <v-row v-if="isHome" align="center" justify="space-between" class="pb-1 pr-2 pl-2">
-            <v-col cols="6">
+        <v-row v-if="isHome" align="center" justify="space-between" class="pb-1 pr-2 pl-2 my-0">
+            <v-col cols="6" class="pl-0">
                 <v-card-title class="title font-weight-bold pl-1">{{ title }}</v-card-title>
             </v-col>
             <v-spacer />
-            <v-col shrink>
+            <v-col class="flex-grow-0">
                 <v-btn :to="pageLink" outline color="secondary" class="text-capitalize ma-0">View All</v-btn>
             </v-col>
         </v-row>
         <v-row v-else align="center" row wrap fill-height pa-2>
             <v-col grow class="title-live">
-                <v-row align-center justify-start row wrap pa-1>
+                <v-row align-center justify-start row wrap pa-1 class="my-0">
                     <v-card-title class="title font-weight-bold pl-1">{{ title }} </v-card-title>
                     <p v-if="hasCaption" class="info--text pl-1">{{ titleCaption }}</p>
                     <slot name="update" />

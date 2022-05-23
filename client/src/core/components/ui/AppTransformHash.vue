@@ -34,7 +34,7 @@ const start = computed<string>(() => {
 
 const end = computed<string>(() => {
     const n = props.hash.length
-    return props.hash.slice(n - 4, 0)
+    return props.hash.slice(n - 4, n)
 })
 
 const hasLink = computed<boolean>(() => {
@@ -56,7 +56,7 @@ $endWidth: 1em * $fontFaceScaleFactor * $endFixedChars;
 .lastPart {
     display: inline-block;
     white-space: nowrap;
-    /* overflow: hidden; */
+    overflow: hidden;
 }
 .firstPart {
     max-width: calc(100% - #{$endWidth});
