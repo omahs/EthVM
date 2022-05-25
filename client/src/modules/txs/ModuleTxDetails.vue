@@ -26,18 +26,6 @@ import { ErrorMessageTx, TitleStatus } from '@/modules/txs/models/ErrorMessagesF
 import { excpTxDoNotExists } from '@/apollo/errorExceptions'
 import { FormattedNumber, FormattedNumberUnit, formatNumber, formatVariableUnitEthValue, formatNonVariableGWeiValue } from '@/core/helper/number-format-helper'
 
-interface ModuleState {
-    transaction: TxDetailsType
-    hasError: boolean
-    subscribed: boolean
-}
-
-const state: ModuleState = reactive({
-    hasError: false,
-    transaction: [],
-    subscribed: false
-})
-
 const props = defineProps({
     txRef: String
 })
@@ -203,16 +191,15 @@ const txDetails = computed<Detail[]>(() => {
     return details
 })
 
-/**
- * Emit error to Sentry
- * @param val {Boolean}
- * @param hashNotFound {Boolean}
- */
-const emitErrorState = (val: boolean, hashNotFound = false): void => {
-    state.hasError = val
-    const mess = hashNotFound ? ErrorMessageTx.notFound : ErrorMessageTx.details
-    emit('errorDetails', state.hasError, mess)
+interface ModuleState {
+    hasError: boolean
+    subscribed: boolean
 }
+
+const state: ModuleState = reactive({
+    hasError: false,
+    subscribed: false
+})
 
 /**
  * Start apollo subscription
@@ -268,6 +255,17 @@ onNewTransactionEvent(({ data }) => {
 onNewTransactionEventError(error => {
     emitErrorState(true)
 })
+
+/**
+ * Emit error to Sentry
+ * @param val {Boolean}
+ * @param hashNotFound {Boolean}
+ */
+const emitErrorState = (val: boolean, hashNotFound = false): void => {
+    state.hasError = val
+    const mess = hashNotFound ? ErrorMessageTx.notFound : ErrorMessageTx.details
+    emit('errorDetails', state.hasError, mess)
+}
 
 onMounted(() => {
     refetchTransactionHash()
