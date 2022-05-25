@@ -7,9 +7,9 @@ export enum ErrorMessagePendingTx {
     details = 'message.error.tx.pending'
 }
 
-export enum TxStatus {
-    success = 'common.success',
-    failed = 'common.fail',
-    pending = 'common.pending',
-    replaced = 'common.replaced'
+export enum TitleStatus {
+    success = 'Success',
+    failed = 'Failed',
+    pending = 'Pending',
+    replaced = 'Replaced'
 }

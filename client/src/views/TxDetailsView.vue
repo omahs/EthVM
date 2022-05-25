@@ -1,6 +1,7 @@
 <template>
     <v-container grid-list-lg class="mb-0">
         <app-error v-if="hasError" :has-error="hasError" :message="state.error" />
+        <app-message :messages="state.errorMessages" />
         <!--
         =====================================================================================
           TX DETAILS LIST
@@ -12,17 +13,18 @@
 
 <script setup lang="ts">
 import { reactive, computed } from 'vue'
+import AppMessage from '@/core/components/ui/AppMessage.vue'
 import AppError from '@/core/components/ui/AppError.vue'
 import { eth } from '@/core/helper'
 import TxDetails from '@/modules/txs/ModuleTxDetails.vue'
 import { ErrorMessageTx } from '@/modules/txs/models/ErrorMessagesForTx'
 
-interface Reactive {
+interface ComponentState {
     errorMessages: ErrorMessageTx[]
     error: string
 }
 
-const state: Reactive = reactive({
+const state: ComponentState = reactive({
     errorMessages: [],
     error: ''
 })

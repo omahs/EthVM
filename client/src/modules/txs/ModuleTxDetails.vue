@@ -19,20 +19,20 @@
 import { reactive, computed, ref, onMounted } from 'vue'
 import BN from 'bignumber.js'
 import AppDetailsList from '@/core/components/ui/AppDetailsList.vue'
-import TxDetailsTitle from '@/modules/txs/components/ModuleTxDetailsTitle.vue'
+import TxDetailsTitle from '@module/txs/components/TxDetailsTitle.vue'
 import { Detail } from '@/core/components/props'
 import { TxDetailsFragment as TxDetailsType, useGetTransactionByHashQuery, useTransactionEventSubscription } from './apollo/TxDetails.generated'
-import { ErrorMessageTx, TxStatus } from '@/modules/txs/models/ErrorMessagesForTx'
+import { ErrorMessageTx, TitleStatus } from '@/modules/txs/models/ErrorMessagesForTx'
 import { excpTxDoNotExists } from '@/apollo/errorExceptions'
 import { FormattedNumber, FormattedNumberUnit, formatNumber, formatVariableUnitEthValue, formatNonVariableGWeiValue } from '@/core/helper/number-format-helper'
 
-interface Reactive {
+interface ModuleState {
     transaction: TxDetailsType
     hasError: boolean
     subscribed: boolean
 }
 
-const state: Reactive = reactive({
+const state: ModuleState = reactive({
     hasError: false,
     transaction: [],
     subscribed: false
@@ -45,86 +45,93 @@ const props = defineProps({
 const emit = defineEmits(['errorDetails'])
 
 const txAmount = computed<FormattedNumber>(() => {
-    return formatVariableUnitEthValue(new BN(state.transaction.value))
+    return formatVariableUnitEthValue(new BN(transactionData.value?.value))
 })
 
 const gasPrice = computed<FormattedNumber>(() => {
-    return formatNonVariableGWeiValue(new BN(state.transaction.gasPrice))
+    return formatNonVariableGWeiValue(new BN(transactionData.value?.gasPrice))
 })
 
 const isReplaced = computed<boolean>(() => {
-    return state.transaction && state.transaction.replacedBy !== null
+    return transactionData.value && transactionData.value?.replacedBy !== null
 })
 
-const txStatus = computed<string>(() => {
+const enum TxStatus {
+    success = 'Successful Tx',
+    failed = 'Failed Tx',
+    pending = 'Pending Tx',
+    replaced = 'Replaced Tx'
+}
+
+const txStatus = computed<TxStatus>(() => {
     if (isReplaced.value) {
-        return 'Replace Tx'
+        return TxStatus.replaced
     }
     const statuses = ['0x0', '0x1']
-    if (state.transaction && state.transaction.status === statuses[0]) {
-        return 'Failed Tx'
+    if (transactionData.value && transactionData.value?.status === statuses[0]) {
+        return TxStatus.failed
     }
-    if (state.transaction && state.transaction.status === statuses[1]) {
-        return 'Successful Tx'
+    if (transactionData.value && transactionData.value?.status === statuses[1]) {
+        return TxStatus.success
     }
-    return 'Pending Transactions'
+    return TxStatus.pending
 })
 
-const titleStatus = computed<TxStatus>(() => {
-    if (!isReplaced.value && state.transaction) {
-        switch (state.transaction.status) {
+const titleStatus = computed<TitleStatus>(() => {
+    if (!isReplaced.value && transactionData.value) {
+        switch (transactionData.value?.status) {
             case '0x0':
-                return TxStatus.failed
+                return TitleStatus.failed
             case '0x1':
-                return TxStatus.success
+                return TitleStatus.success
             default:
-                return TxStatus.pending
+                return TitleStatus.pending
         }
     }
-    return TxStatus.replaced
+    return TitleStatus.replaced
 })
 
 const txFee = computed<FormattedNumber>(() => {
-    if (state.transaction && state.transaction.gasUsed) {
-        const price = new BN(state.transaction.gasPrice)
-        const used = new BN(state.transaction.gasUsed)
+    if (transactionData.value && transactionData.value?.gasUsed) {
+        const price = new BN(transactionData.value?.gasPrice)
+        const used = new BN(transactionData.value?.gasUsed)
         const fee = price.times(used)
         return formatVariableUnitEthValue(fee)
     }
-    if (!isReplaced.value && txStatus.value === 'pending') {
-        const fee = new BN(state.transaction.gas).multipliedBy(state.transaction.gasPrice)
+    if (!isReplaced.value && txStatus.value === TxStatus.Pending) {
+        const fee = new BN(transactionData.value?.gas).multipliedBy(transactionData.value?.gasPrice)
         return formatVariableUnitEthValue(fee)
     }
     return { value: '0', unit: FormattedNumberUnit.ETH }
 })
 
 const pendingString = computed<string>(() => {
-    return !isReplaced.value && txStatus.value === 'pending' ? 'Estimated Fee' : 'Tx Fee'
+    return !isReplaced.value && txStatus.value === TxStatus.Pending ? 'Estimated Fee' : 'Tx Fee'
 })
 
 const txDetails = computed<Detail[]>(() => {
-    const isNotContractCreation = typeof state.transaction.contractAddress !== 'string'
+    const isNotContractCreation = typeof transactionData.value?.contractAddress !== 'string'
     const details: Detail[] = [
         {
             title: 'Hash',
-            detail: state.transaction.hash,
+            detail: transactionData.value?.hash,
             copy: true,
             mono: true
         },
         {
             title: 'From',
-            detail: state.transaction.from,
+            detail: transactionData.value?.from,
             copy: true,
-            link: `/address/${state.transaction.from}`,
+            link: `/address/${transactionData.value?.from}`,
             mono: true,
             toChecksum: true
         },
         {
             title: isNotContractCreation ? 'To' : 'Contract Creation',
-            detail: isNotContractCreation ? state.transaction.to : state.transaction.contractAddress,
-            copy: state.transaction.to !== null,
-            link: state.transaction.to !== null ? `/address/${state.transaction.to!}` : `/address/${state.transaction.contractAddress}`,
-            mono: state.transaction.to !== null,
+            detail: isNotContractCreation ? transactionData.value?.to : transactionData.value?.contractAddress,
+            copy: transactionData.value?.to !== null,
+            link: transactionData.value?.to !== null ? `/address/${transactionData.value?.to}` : `/address/${transactionData.value?.contractAddress}`,
+            mono: transactionData.value?.to !== null,
             toChecksum: true
         },
         {
@@ -144,7 +151,7 @@ const txDetails = computed<Detail[]>(() => {
         },
         {
             title: 'Gas limit',
-            detail: formatNumber(new BN(state.transaction.gas).toNumber())
+            detail: formatNumber(new BN(transactionData.value?.gas).toNumber())
         },
 
         {
@@ -154,41 +161,41 @@ const txDetails = computed<Detail[]>(() => {
         },
         {
             title: 'Gas Used',
-            detail: formatNumber(new BN(state.transaction.gasUsed || 0).toNumber()) // TODO genesis block txs can have no receipt
+            detail: formatNumber(new BN(transactionData.value?.gasUsed || 0).toNumber()) // TODO genesis block txs can have no receipt
         },
         {
             title: 'Nonce',
-            detail: state.transaction.nonce
+            detail: transactionData.value?.nonce
         },
 
         {
             title: 'Input Data',
-            detail: state.transaction.input
+            detail: transactionData.value?.input
             // txInput: this.inputFormatted
         }
     ]
-    if (txStatus.value !== 'Pending Transactions' && !isReplaced.value) {
+    if (txStatus.value !== TxStatus.Pending && !isReplaced.value) {
         const time = {
             title: 'Timestamp',
-            detail: state.transaction.timestamp !== null ? new Date(state.transaction.timestamp * 1e3).toString() : ''
+            detail: transactionData.value?.timestamp !== null ? new Date(transactionData.value?.timestamp * 1e3).toString() : ''
         }
         details.splice(1, 0, time)
     }
 
-    if (txStatus.value !== 'pending' && !isReplaced.value) {
+    if (txStatus.value !== TxStatus.Pending && !isReplaced.value) {
         const block = {
             title: 'Block #',
-            detail: formatNumber(state.transaction.blockNumber || 0),
-            link: `/block/number/${state.transaction.blockNumber}`
+            detail: formatNumber(transactionData.value?.blockNumber || 0),
+            link: `/block/number/${transactionData.value?.blockNumber}`
         }
         details.splice(0, 0, block)
     }
-    if (state.transaction.replacedBy !== null) {
+    if (transactionData.value?.replacedBy !== null) {
         const replaced = {
             title: 'Replaced By',
-            detail: state.transaction.replacedBy,
+            detail: transactionData.value?.replacedBy,
             copy: true,
-            link: state.transaction.replacedBy,
+            link: transactionData.value?.replacedBy,
             mono: true
         }
         details.splice(1, 0, replaced)
@@ -211,21 +218,24 @@ const emitErrorState = (val: boolean, hashNotFound = false): void => {
  * Start apollo subscription
  */
 const {
-    result,
+    result: transactionHashResult,
     onResult: onTransactionHashLoaded,
     onError: onTransactionHashError,
     loading: loadingTransactionHash,
     refetch: refetchTransactionHash
-} = useGetTransactionByHashQuery({ hash: props.txRef }, { notifyOnNetworkStatusChange: true })
+} = useGetTransactionByHashQuery({ hash: props.txRef }, { notifyOnNetworkStatusChange: true, fetchPolicy: 'network-only' })
 
 onTransactionHashLoaded(({ data }) => {
     if (data && data.getTransactionByHash) {
-        state.transaction = data.getTransactionByHash
-        if (!isReplaced.value && txStatus.value === 'pending' && !state.subscribed) {
-            // this.startSubscription()
+        if (!isReplaced.value && txStatus.value === TxStatus.pending && !state.subscribed) {
+            subscriptionEnabled.value = true
         }
         emitErrorState(false)
     }
+})
+
+const transactionData = computed<TxDetailsType>(() => {
+    return transactionHashResult?.value?.getTransactionByHash
 })
 
 onTransactionHashError(error => {
@@ -241,18 +251,18 @@ const isLoading = computed<boolean | undefined>(() => {
     return loadingTransactionHash.value || state.hasError
 })
 
-const subscriptionEnabled = ref(false)
+const subscriptionEnabled = ref(true)
 
 const { onResult: onNewTransactionEvent, onError: onNewTransactionEventError } = useTransactionEventSubscription(
-    { hash: state.transaction.hash },
+    { hash: props.txRef },
     {
         enabled: subscriptionEnabled.value
     }
 )
 
 onNewTransactionEvent(({ data }) => {
-    console.log(data)
     refetchTransactionHash()
+    subscriptionEnabled.value = false
 })
 
 onNewTransactionEventError(error => {
@@ -260,26 +270,6 @@ onNewTransactionEventError(error => {
 })
 
 onMounted(() => {
-    console.log('Refetching')
     refetchTransactionHash()
 })
-
-// startSubscription(): void {
-//     const _hash = this.transaction.hash
-//     const observer = this.$apollo.subscribe({
-//         query: transactionEvent,
-//         variables: {
-//             hash: _hash
-//         }
-//     })
-//     const a = observer.subscribe({
-//         next: data => {
-//             a.unsubscribe()
-//             this.$apollo.queries.transaction.refetch()
-//         },
-//         error: error => {
-//             this.emitErrorState(true)
-//         }
-//     })
-// }
 </script>

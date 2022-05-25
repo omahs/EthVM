@@ -1,9 +1,9 @@
 <template>
     <div class="pb-1 pt-1">
-        <v-layout align-center justify-start class="pa-1">
+        <v-row align="center" justify="start" class="pa-1">
             <v-card-title align-center justify-start class="title font-weight-bold pl-4"> Transaction Details </v-card-title>
             <app-tooltip :text="status" :icon-color="statusColor" :spin="statusSpin" :icon-type="statusIcon" />
-        </v-layout>
+        </v-row>
         <v-divider class="lineGrey mt-1 mb-1" />
     </div>
 </template>
@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import AppTooltip from '@/core/components/ui/AppTooltip.vue'
-import { TxStatus } from '@/modules/txs/models/ErrorMessagesForTx'
+import { TitleStatus } from '@/modules/txs/models/ErrorMessagesForTx'
 
 const props = defineProps({
     status: {
@@ -28,32 +28,32 @@ const props = defineProps({
 
 const statusIcon = computed<string>(() => {
     switch (props.status) {
-        case TxStatus.success:
+        case TitleStatus.success:
             return 'mdi-check-circle'
-        case TxStatus.failed:
-            return 'fa fa-times-circle'
-        case TxStatus.pending:
-            return 'fas fa-circle-notch'
+        case TitleStatus.failed:
+            return 'mdi-close-circle-outline'
+        case TitleStatus.pending:
+            return 'mdi-sync'
         default:
-            return 'fa fa-retweet'
+            return 'mdi-sync'
     }
 })
 
 const statusColor = computed<string>(() => {
     switch (props.status) {
-        case TxStatus.success:
+        case TitleStatus.success:
             return 'green'
-        case TxStatus.failed:
-            return 'txFail'
-        case TxStatus.pending:
-            return 'txPen'
+        case TitleStatus.failed:
+            return 'red'
+        case TitleStatus.pending:
+            return 'orange'
         default:
             return 'info'
     }
 })
 
 const statusSpin = computed<boolean>(() => {
-    return props.status === TxStatus.pending
+    return props.status === TitleStatus.pending
 })
 </script>
 

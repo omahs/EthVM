@@ -39,7 +39,7 @@ import { useResult } from '@vue/apollo-composable'
 import TxsTable from '@module/txs/components/TxsTable.vue'
 import BN from 'bignumber.js'
 
-interface Reactive {
+interface ModuleState {
     initialLoad: boolean
     index: number
     isEnd: number
@@ -47,7 +47,7 @@ interface Reactive {
     hasError: boolean
 }
 
-const state: Reactive = reactive({
+const state: ModuleState = reactive({
     initialLoad: true,
     index: 0,
     isEnd: 0,
