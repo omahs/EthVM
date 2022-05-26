@@ -103,7 +103,7 @@ const loading = computed<boolean>(() => {
         return true
     }
     if (isHome.value) {
-        return loadingTxs.value
+        return state.initialLoad
     }
 
     if (isBlock.value) {
