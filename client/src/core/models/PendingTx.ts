@@ -1,4 +1,4 @@
-import { EthValue, Hex } from '@/core/models'
+import { EthValue, Hex } from '@core/models'
 
 export class PendingTx {
     public readonly id: string

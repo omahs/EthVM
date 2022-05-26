@@ -29,10 +29,10 @@
 </template>
 
 <script setup lang="ts">
-import AppTableTitle from '@/core/components/ui/AppTableTitle.vue'
-import AppNewUpdate from '@/core/components/ui/AppNewUpdate.vue'
-import AppPaginateHasMore from '@/core/components/ui/AppPaginateHasMore.vue'
-import AppPaginate from '@/core/components/ui/AppPaginate.vue'
+import AppTableTitle from '@core/components/ui/AppTableTitle.vue'
+import AppNewUpdate from '@core/components/ui/AppNewUpdate.vue'
+import AppPaginateHasMore from '@core/components/ui/AppPaginateHasMore.vue'
+import AppPaginate from '@core/components/ui/AppPaginate.vue'
 import { useGetAllTxsQuery, useNewTransfersCompleteFeedSubscription, useGetBlockTransfersQuery } from './apollo/transfersQuery.generated'
 import { computed, reactive } from 'vue'
 import { useResult } from '@vue/apollo-composable'

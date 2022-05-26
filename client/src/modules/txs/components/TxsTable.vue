@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import AppTableRowLoading from '@/core/components/ui/AppTableRowLoading.vue'
+import AppTableRowLoading from '@core/components/ui/AppTableRowLoading.vue'
 import { useDisplay } from 'vuetify/lib/framework.mjs'
 import { computed } from 'vue'
 import TxsTableRow from '@module/txs/components/TxsTableRow.vue'

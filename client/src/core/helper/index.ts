@@ -1,1 +1,1 @@
-export * from '@/core/helper/eth'
+export * from '@core/helper/eth'

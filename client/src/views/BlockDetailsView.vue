@@ -29,10 +29,10 @@
 
 <script setup lang="ts">
 import { reactive, computed, onMounted } from 'vue'
-import AppMessage from '@/core/components/ui/AppMessage.vue'
-import AppError from '@/core/components/ui/AppError.vue'
+import AppMessage from '@core/components/ui/AppMessage.vue'
+import AppError from '@core/components/ui/AppError.vue'
 import BlockTxs from '@module/txs/ModuleTxs.vue'
-import { eth } from '@/core/helper'
+import { eth } from '@core/helper'
 import { ErrorMessageBlock } from '@/modules/block/models/ErrorMessagesForBlock'
 
 interface ComponentState {

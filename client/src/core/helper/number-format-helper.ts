@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import { EthValue } from '@/core/models'
+import { EthValue } from '@core/models'
 
 export enum FormattedNumberUnit {
     ETH = 'eth',

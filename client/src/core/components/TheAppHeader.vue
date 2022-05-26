@@ -1,5 +1,5 @@
 <template>
-    <v-app-bar color="white">
+    <v-app-bar color="white" flat>
         <v-btn v-if="md || sm || xs" icon color="primary" @click.stop="$emit('openDrawer')">
             <v-icon>mdi-menu</v-icon>
         </v-btn>

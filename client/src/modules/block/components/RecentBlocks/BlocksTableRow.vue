@@ -57,7 +57,7 @@
           Block Info
         =====================================================================================
         -->
-                <v-row grid-list-xs row wrap align-center justify-start fill-height pl-3 pr-2 pt-2 pb-1>
+                <v-row grid-list-xs row wrap align="center" justify="start" class="fill-height">
                     <v-col sm="2">
                         <router-link :to="`/block/number/${block.number}`" class="black--text pb-1">{{ _block.number }}</router-link>
                     </v-col>
@@ -106,7 +106,7 @@ import AppTransformHash from '@core/components/ui/AppTransformHash.vue'
 import { eth } from '@core/helper'
 import BN from 'bignumber.js'
 
-import AppTooltip from '@/core/components/ui/AppTooltip.vue'
+import AppTooltip from '@core/components/ui/AppTooltip.vue'
 import { computed } from 'vue'
 import { useDisplay } from 'vuetify/lib/framework.mjs'
 import { formatNonVariableEthValue, formatNumber } from '@core/helper/number-format-helper'

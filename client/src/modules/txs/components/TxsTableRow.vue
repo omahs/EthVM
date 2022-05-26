@@ -131,11 +131,11 @@ import AppTransformHash from '@core/components/ui/AppTransformHash.vue'
 
 import BN from 'bignumber.js'
 import { Tx } from '../types'
-import AppTooltip from '@/core/components/ui/AppTooltip.vue'
+import AppTooltip from '@core/components/ui/AppTooltip.vue'
 import { computed } from 'vue'
-import { eth } from '@/core/helper'
+import { eth } from '@core/helper'
 import { useDisplay } from 'vuetify/lib/framework.mjs'
-import { formatNumber, formatVariableUnitEthValue } from '@core/helper/number-format-helper'
+import { formatNumber, formatNonVariableEthValue } from '@core/helper/number-format-helper'
 
 const { mdAndDown, mdAndUp, smAndDown } = useDisplay()
 
@@ -164,8 +164,8 @@ const transaction = computed<Tx>(() => {
         from: tx['from'],
         to: tx['to'],
         timestamp: new Date(tx['timestamp'] * 1e3).toDateString(),
-        fee: formatVariableUnitEthValue(new BN(tx['txFee'])),
-        value: formatVariableUnitEthValue(new BN(props.tx ? props.tx.value : '')),
+        fee: formatNonVariableEthValue(new BN(tx['txFee'])),
+        value: formatNonVariableEthValue(new BN(props.tx ? props.tx.value : '')),
         status: tx['status'] != null ? tx['status'] : false
     }
 })

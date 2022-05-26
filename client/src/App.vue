@@ -14,3 +14,9 @@ import clients from './apollo'
 import TheAppNavigationDrawer from '@core/components/TheAppNavigationDrawer.vue'
 provide(ApolloClients, clients)
 </script>
+
+<style lang="scss">
+.v-application {
+    background-color: #f3f4f8;
+}
+</style>

@@ -31,7 +31,7 @@ import { ref, computed } from 'vue'
 //Apollo
 import { useResult } from '@vue/apollo-composable'
 import { useGetLatestBlockInfoQuery } from './apollo/BlockStats/blockStats.generated'
-import { useBlockSubscription } from '@/core/mixins/newBlock.mixin'
+import { useBlockSubscription } from '@core/mixins/newBlock.mixin'
 
 import BN from 'bignumber.js'
 
