@@ -69,7 +69,9 @@ $endWidth: 1em * $fontFaceScaleFactor * $endFixedChars;
 }
 .hash-container {
     white-space: nowrap;
-    /* overflow: hidden; */
+    overflow: hidden;
+    width: 100%;
     line-height: 1rem;
+    padding-top: 5px;
 }
 </style>

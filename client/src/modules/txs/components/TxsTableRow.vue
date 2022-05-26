@@ -1,5 +1,5 @@
 <template>
-    <v-container class="pa-0">
+    <v-container class="pa-0 text-body-2">
         <v-row d-block>
             <!--
       =====================================================================================
@@ -8,7 +8,7 @@
       -->
             <v-col xs="12" v-if="!mdAndUp">
                 <div :class="isPending ? 'table-row-mobile' : txStatusClass">
-                    <v-row grid-list-xs row wrap align="center" justify-start fill-height class="pt-3 pb-3 pr-4 pl-4">
+                    <v-row grid-list-xs row wrap align="center" justify="start" fill-height class="pt-3 pb-3 pr-4 pl-4">
                         <v-col cols="6" class="pa-1">
                             <router-link :to="`/block/number/${transferObj.block}`" class="black--text font-weight-medium pb-1">
                                 Block # {{ transaction.block }}
@@ -31,11 +31,11 @@
                         <v-col cols="12" class="pa-1">
                             <v-row align="center" class="pa-2">
                                 <p class="info--text psmall pr-1">Addresses:</p>
-                                <app-transform-hash :hash="transaction.from" :italic="true" :link="`/address/${transaction.from}`" />
+                                <app-transform-hash :hash="eth.toCheckSum(transaction.from)" :italic="true" :link="`/address/${transaction.from}`" />
                                 <v-icon class="fas fa-arrow-right primary--text pl-2 pr-2" small>mdi-arrow-right</v-icon>
                                 <app-transform-hash
                                     v-if="transaction.to && transaction.to !== ''"
-                                    :hash="transaction.to"
+                                    :hash="eth.toCheckSum(transaction.to)"
                                     :italic="true"
                                     :link="`/address/${transaction.to}`"
                                 />
@@ -60,13 +60,13 @@
         Tablet/ Desktop (SM - XL)
       =====================================================================================
       -->
-            <v-col v-else sm="12" class="pt-2">
+            <v-col v-else sm="12" class="py-2">
                 <!--
         =====================================================================================
           Block Info
         =====================================================================================
         -->
-                <v-row grid-list-xs row wrap align-center justify-start fill-height pl-3 pr-2 pt-2 pb-1>
+                <v-row grid-list-xs row wrap align="center" justify-start fill-height pl-3 pr-2 pt-2 pb-1>
                     <v-col v-if="!isPending" sm="2" lg="1">
                         <router-link :to="`/block/number/${transferObj.block}`" class="black--text pb-1">{{ transaction.block }}</router-link>
                     </v-col>
@@ -74,21 +74,21 @@
                         <v-row align="center" class="pr-3 pl-2">
                             <v-col sm="12">
                                 <v-row align="center" justify="start" class="pa-2 flex-nowrap">
-                                    <p class="info--text pr-1">Tx #:</p>
+                                    <p class="info--text pr-1 flex-shrink-0">Tx #:</p>
                                     <app-transform-hash :hash="transaction.hash" :link="`/tx/${transaction.hash}`" />
                                 </v-row>
                             </v-col>
                             <v-col row sm="12">
-                                <v-row align="center">
+                                <v-row align="center" class="flex-nowrap mx-0">
                                     <p class="info--text mr-1">From:</p>
-                                    <app-transform-hash :hash="transaction.from" :link="`/address/${transaction.from}`" :italic="true" />
+                                    <app-transform-hash :hash="eth.toCheckSum(transaction.from)" :link="`/address/${transaction.from}`" :italic="true" />
                                     <v-icon class="fas fa-arrow-right primary--text pl-2 pr-2" small>mdi-arrow-right</v-icon>
                                     <p v-if="transaction.to && transaction.to !== ''" class="info--text mr-1">To:</p>
                                     <p v-else class="info--text">Contract Creation</p>
                                     <!-- <app-transform-hash v-if="tx.isContractCreation" :hash="tx.creates" :link="`/address/${tx.creates}`" :italic="true" /> -->
                                     <app-transform-hash
                                         v-if="transaction.to && transaction.to !== ''"
-                                        :hash="transaction.to"
+                                        :hash="eth.toCheckSum(transaction.to)"
                                         :link="`/address/${transaction.to}`"
                                         :italic="true"
                                     />
@@ -96,7 +96,7 @@
                             </v-col>
                         </v-row>
                     </v-col>
-                    <v-col sm="3" lg="2">
+                    <v-col sm="3" lg="2" class="pr-3 pl-2">
                         <p :class="isPending ? 'pl-4' : ''">
                             {{ transaction.value.value }}
                             {{ transaction.value.unit }}
@@ -109,7 +109,7 @@
                     </v-col>
                     <v-col v-if="!mdAndDown" lg="1">
                         <p :class="['black--text', 'text-truncate', 'mb-0', isPending ? 'pl-3' : '']">
-                            {{ transaction.fee }}
+                            {{ transaction.fee.value }}
                         </p>
                     </v-col>
                     <v-col v-if="!isPending" lg="1">
@@ -118,6 +118,8 @@
                     </v-col>
                     <p v-if="isPending && transaction.isMined" class="caption primary--text blinking">Mined</p>
                 </v-row>
+            </v-col>
+            <v-col sm="12">
                 <v-divider class="mb-2 mt-2" />
             </v-col>
         </v-row>
@@ -131,7 +133,9 @@ import BN from 'bignumber.js'
 import { Tx } from '../types'
 import AppTooltip from '@/core/components/ui/AppTooltip.vue'
 import { computed } from 'vue'
+import { eth } from '@/core/helper'
 import { useDisplay } from 'vuetify/lib/framework.mjs'
+import { formatNumber, formatVariableUnitEthValue } from '@core/helper/number-format-helper'
 
 const { mdAndDown, mdAndUp, smAndDown } = useDisplay()
 
@@ -156,12 +160,12 @@ const transaction = computed<Tx>(() => {
     return {
         isMined: props.isPending ? tx['isMined'] : false,
         hash: tx['transactionHash'],
-        block: new BN(tx['block']).toFormat(),
+        block: formatNumber(new BN(tx['block'])),
         from: tx['from'],
         to: tx['to'],
-        timestamp: new Date(tx['timestamp'] * 1e3),
-        fee: new BN(tx['txFee']).toFormat(),
-        value: new BN(props.tx ? props.tx.value : '').toFormat(),
+        timestamp: new Date(tx['timestamp'] * 1e3).toDateString(),
+        fee: formatVariableUnitEthValue(new BN(tx['txFee'])),
+        value: formatVariableUnitEthValue(new BN(props.tx ? props.tx.value : '')),
         status: tx['status'] != null ? tx['status'] : false
     }
 })

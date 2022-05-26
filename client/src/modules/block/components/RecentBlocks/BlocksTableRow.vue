@@ -1,5 +1,5 @@
 <template>
-    <v-container class="pa-0">
+    <v-container class="pa-0 text-body-2">
         <v-row d-block>
             <!--
       =====================================================================================
@@ -32,15 +32,15 @@
                             <p class="info--text psmall pr-1">Miner:</p>
                         </v-col>
                         <v-col cols="10" class="pa-1">
-                            <app-transform-hash :hash="_block.miner" :italic="true" :link="`/address/${_block.miner}`" class="pl-6" />
+                            <app-transform-hash :hash="eth.toCheckSum(_block.miner)" :italic="true" :link="`/address/${_block.miner}`" class="pl-6" />
                         </v-col>
                         <v-col cols="2" class="pa-1">
                             <p class="info--text psmall">Reward:</p>
                         </v-col>
                         <v-col cols="10" class="pa-1">
                             <p class="black--text align-center pl-6">
-                                {{ _block.rewards }}
-                                <!--                                <app-tooltip v-if="_block.rewards.tooltipText" :text="`${_block.rewards.tooltipText} ETH`" />-->
+                                {{ _block.rewards.value }}
+                                <app-tooltip v-if="_block.rewards.tooltipText" :text="`${_block.rewards.tooltipText} ETH`" />
                             </p>
                         </v-col>
                     </v-row>
@@ -63,13 +63,17 @@
                     </v-col>
                     <v-col sm="5">
                         <v-row>
-                            <v-col row align-center pb-2 sm="12">
-                                <p class="info--text pr-1">Miner:</p>
-                                <app-transform-hash :hash="_block.miner" :italic="true" :link="`/address/${_block.miner}`" />
+                            <v-col sm="12" class="pb-2">
+                                <v-row align="center" class="flex-nowrap ma-0">
+                                    <p class="info--text pr-1">Miner:</p>
+                                    <app-transform-hash :hash="eth.toCheckSum(_block.miner)" :italic="true" :link="`/address/${_block.miner}`" />
+                                </v-row>
                             </v-col>
-                            <v-col row sm="12">
-                                <p class="info--text psmall pr-2">Age:</p>
-                                {{ _block.timestamp }}
+                            <v-col sm="12" class="pt-0">
+                                <v-row align="center" class="flex-nowrap ma-0">
+                                    <p class="info--text psmall pr-2">Age:</p>
+                                    {{ _block.timestamp }}
+                                </v-row>
                             </v-col>
                         </v-row>
                     </v-col>
@@ -82,8 +86,8 @@
                     </v-col>
                     <v-col sm="2">
                         <p class="black--text align-center mb-0">
-                            {{ _block.rewards }}
-                            <!-- <app-tooltip v-if="_block.rewards.tooltipText" :text="`${_block.rewards.tooltipText} ETH`" /> -->
+                            {{ _block.rewards.value }}
+                            <app-tooltip v-if="_block.rewards.tooltipText" :text="`${_block.rewards.tooltipText} ETH`" />
                         </p>
                     </v-col>
                 </v-row>
@@ -99,12 +103,13 @@
 import AppTransformHash from '@core/components/ui/AppTransformHash.vue'
 // import { NumberFormatMixin } from '@app/core/components/mixins/number-format.mixin'
 // import AppTimeAgo from '@app/core/components/ui/AppTimeAgo.vue'
-
+import { eth } from '@core/helper'
 import BN from 'bignumber.js'
 
 import AppTooltip from '@/core/components/ui/AppTooltip.vue'
 import { computed } from 'vue'
 import { useDisplay } from 'vuetify/lib/framework.mjs'
+import { formatNonVariableEthValue, formatNumber } from '@core/helper/number-format-helper'
 
 const { mdAndUp, xl } = useDisplay()
 
@@ -114,13 +119,13 @@ const props = defineProps({
 
 const _block = computed(() => {
     return {
-        number: props.block.number,
+        number: formatNumber(props.block.number),
         miner: props.block.miner,
-        rewards: new BN(props.block.rewards.total).toExponential(4),
-        timestamp: new Date(props.block.timestamp * 1e3),
-        totalTx: props.block.txCount,
-        txFail: props.block.txFail,
-        txSuccess: props.block.txCount - props.block.txFail
+        rewards: formatNonVariableEthValue(new BN(props.block.rewards.total)),
+        timestamp: new Date(props.block.timestamp * 1e3).toDateString(),
+        totalTx: formatNumber(props.block.txCount),
+        txFail: formatNumber(props.block.txFail),
+        txSuccess: formatNumber(props.block.txCount - props.block.txFail)
     }
 })
 </script>

@@ -1,7 +1,7 @@
 <template>
     <v-tooltip top color="white" content-class="tooltip-border">
-        <template #activator="data">
-            <v-icon :class="iconClass" dark small v-on="data.on">{{ iconType }}</v-icon>
+        <template #activator="{ props }">
+            <v-icon :class="iconClass" :color="iconColor" dark small v-bind="props">{{ iconType }}</v-icon>
         </template>
         <span class="black--text">{{ text }}</span>
     </v-tooltip>
@@ -14,7 +14,7 @@ const props = defineProps({
     text: String,
     iconType: {
         type: String,
-        default: 'fa fa-question-circle'
+        default: 'mdi-help-circle-outline'
     },
     iconColor: {
         type: String,
@@ -38,5 +38,14 @@ const iconClass = computed<string>(() => {
     padding: 5px 10px !important;
     opacity: 1 !important;
     box-shadow: none !important;
+}
+
+@keyframes pulse {
+    to {
+        transform: rotate(360deg);
+    }
+}
+.fa-pulse {
+    animation: pulse 1s linear infinite;
 }
 </style>

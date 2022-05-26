@@ -46,7 +46,7 @@
             <v-card v-if="!hasMessage" :style="getStyle" variant="contained-flat" class="scroll-y pt-2 pr-2 pl-2 pb-0">
                 <v-row column class="mb-1">
                     <v-col v-if="!isLoading" xs="12">
-                        <v-card v-for="(tx, index) in txsData" :key="index" variant="contained-flat">
+                        <v-card v-for="(tx, index) in displayData" :key="index" variant="contained-flat">
                             <txs-table-row :tx="tx" :is-pending="pending" />
                         </v-card>
                     </v-col>
@@ -103,6 +103,15 @@ const hasMessage = computed<boolean>(() => {
 
 const getStyle = computed<string>(() => {
     return props.isScrollView ? SCROLLVIEW : ''
+})
+
+const displayData = computed<any[]>(() => {
+    if (props.txsData) {
+        const start = props.index * props.maxItems
+        const end = start + props.maxItems > props.txsData.length ? props.txsData.length : start + props.maxItems
+        return props.txsData.slice(start, end)
+    }
+    return []
 })
 </script>
 

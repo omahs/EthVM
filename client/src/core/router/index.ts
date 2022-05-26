@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 import { ROUTE_NAME } from './routesNames'
 import HomeView from '@view/HomeView.vue'
 import BlocksView from '@view/BlocksView.vue'
+import BlockDetailsView from '@view/BlockDetailsView.vue'
 import TxsView from '@view/TxsView.vue'
 import ViewTemp from '@view/ViewTemp.vue'
 const routes: Array<RouteRecordRaw> = [
@@ -16,9 +17,20 @@ const routes: Array<RouteRecordRaw> = [
         component: BlocksView
     },
     {
+        path: ROUTE_NAME.BLOCK_NUMBER.PATH,
+        name: ROUTE_NAME.BLOCK_NUMBER.NAME,
+        component: BlockDetailsView,
+        props: true
+    },
+    {
         path: ROUTE_NAME.TXS.PATH,
         name: ROUTE_NAME.TXS.NAME,
         component: TxsView
+    },
+    {
+        path: ROUTE_NAME.TX_HASH.PATH,
+        name: ROUTE_NAME.TX_HASH.NAME,
+        component: ViewTemp
     },
     {
         path: ROUTE_NAME.TXS_PENDING.PATH,
@@ -33,6 +45,11 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: ROUTE_NAME.CHARTS.PATH,
         name: ROUTE_NAME.CHARTS.NAME,
+        component: ViewTemp
+    },
+    {
+        path: ROUTE_NAME.ADDRESS.PATH,
+        name: ROUTE_NAME.ADDRESS.NAME,
         component: ViewTemp
     },
     {
