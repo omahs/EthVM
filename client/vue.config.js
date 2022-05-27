@@ -40,5 +40,16 @@ module.exports = defineConfig({
                 '@core': path.resolve(__dirname, 'src/core/')
             }
         }
+    },
+    chainWebpack: config => {
+        config.module
+            .rule('vue')
+            .use('vue-loader')
+            .tap(options => {
+                return {
+                    ...options,
+                    reactivityTransform: true
+                }
+            })
     }
 })

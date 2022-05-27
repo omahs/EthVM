@@ -7,7 +7,7 @@
           Block DETAILS LIST
         =====================================================================================
         -->
-        <!--        <tx-details v-if="isValid && !hasError" :tx-ref="txRef" @errorDetails="setError" />-->
+        <block-details v-if="isValid" :block-ref="blockRef" :is-hash="isHash" @errorDetails="setError" @isMined="setIsMined" @setBlockNumber="setBlockNumber" />
 
         <!--
         =====================================================================================
@@ -18,7 +18,7 @@
         <block-txs
             v-if="showBlockTxs"
             :max-items="10"
-            :block-ref="state.blockNumber"
+            :block-ref="blockRef"
             :is-hash="isHash"
             :is-mined="state.isMined"
             page-type="blockDetails"
@@ -28,12 +28,13 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, computed, onMounted } from 'vue'
+import { reactive, computed, onMounted, watch } from 'vue'
 import AppMessage from '@core/components/ui/AppMessage.vue'
 import AppError from '@core/components/ui/AppError.vue'
 import BlockTxs from '@module/txs/ModuleTxs.vue'
+import BlockDetails from '@module/block/ModuleBlockDetails.vue'
 import { eth } from '@core/helper'
-import { ErrorMessageBlock } from '@/modules/block/models/ErrorMessagesForBlock'
+import { ErrorMessageBlock } from '@module/block/models/ErrorMessagesForBlock'
 
 interface ComponentState {
     errorMessages: ErrorMessageBlock[]
@@ -63,14 +64,11 @@ const showBlockTxs = computed<boolean>(() => {
     return isValid.value && state.blockNumber !== ''
 })
 
-if (!isValid.value) {
-    state.error = 'This is not a valid transaction hash'
-    window.scrollTo(0, 0)
-}
-
 onMounted(() => {
+    window.scrollTo(0, 0)
     if (!isHash.value) {
-        state.blockNumber = props.blockRef
+        state.blockNumber = props.blockRef.toString()
+        console.log(state)
     }
 })
 
@@ -78,7 +76,7 @@ onMounted(() => {
  * Sets isMined to true
  */
 const setIsMined = (): void => {
-    this.isMined = true
+    state.isMined = true
 }
 
 /**
@@ -86,7 +84,7 @@ const setIsMined = (): void => {
  * @param value {String}
  */
 const setBlockNumber = (value: string): void => {
-    this.blockNumber = value
+    state.blockNumber = value
 }
 
 /**

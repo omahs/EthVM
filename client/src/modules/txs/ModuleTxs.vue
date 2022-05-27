@@ -34,7 +34,7 @@ import AppNewUpdate from '@core/components/ui/AppNewUpdate.vue'
 import AppPaginateHasMore from '@core/components/ui/AppPaginateHasMore.vue'
 import AppPaginate from '@core/components/ui/AppPaginate.vue'
 import { useGetAllTxsQuery, useNewTransfersCompleteFeedSubscription, useGetBlockTransfersQuery } from './apollo/transfersQuery.generated'
-import { computed, reactive } from 'vue'
+import { computed, reactive, watch } from 'vue'
 import { useResult } from '@vue/apollo-composable'
 import TxsTable from '@module/txs/components/TxsTable.vue'
 import BN from 'bignumber.js'
@@ -161,12 +161,17 @@ const {
     }
 )
 
-const { loading: loadingBlockTxs, result: getAlBlockTransfersResult } = useGetBlockTransfersQuery(
+const {
+    loading: loadingBlockTxs,
+    result: getAlBlockTransfersResult,
+    refetch: refetchBlockTransfers
+} = useGetBlockTransfersQuery(
     {
-        _number: props.blockRef ? parseInt(props.blockRef, 10) : undefined
+        _number: props.blockRef ? parseInt(props.blockRef) : undefined
     },
     {
-        enabled: !(props.isMined && isBlock.value)
+        notifyOnNetworkStatusChange: true,
+        enabled: props.isMined && isBlock.value
     }
 )
 
@@ -229,6 +234,15 @@ const setPage = async (page: number, reset = false): Promise<boolean> => {
     state.index = page
     return true
 }
+
+watch(
+    () => props.blockRef,
+    data => {
+        state.initialLoad = true
+        state.hasError = false
+        refetchBlockTransfers({ _number: parseInt(props.blockRef) })
+    }
+)
 </script>
 <style scoped lang="css">
 .tx-filter-select-container {
