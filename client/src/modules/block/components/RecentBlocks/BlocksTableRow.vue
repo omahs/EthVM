@@ -103,7 +103,7 @@
 import AppTransformHash from '@core/components/ui/AppTransformHash.vue'
 // import { NumberFormatMixin } from '@app/core/components/mixins/number-format.mixin'
 // import AppTimeAgo from '@app/core/components/ui/AppTimeAgo.vue'
-import { eth } from '@core/helper'
+import { eth, timeAgo } from '@core/helper'
 import BN from 'bignumber.js'
 
 import AppTooltip from '@core/components/ui/AppTooltip.vue'
@@ -122,7 +122,7 @@ const _block = computed(() => {
         number: formatNumber(props.block.number),
         miner: props.block.miner,
         rewards: formatNonVariableEthValue(new BN(props.block.rewards.total)),
-        timestamp: new Date(props.block.timestamp * 1e3).toDateString(),
+        timestamp: timeAgo(new Date(props.block.timestamp * 1e3)),
         totalTx: formatNumber(props.block.txCount),
         txFail: formatNumber(props.block.txFail),
         txSuccess: formatNumber(props.block.txCount - props.block.txFail)

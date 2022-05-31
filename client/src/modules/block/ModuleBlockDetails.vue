@@ -207,7 +207,6 @@ const { onResult: onNewBlockLoaded } = useNewBlockFeedSubscription(() => ({
 }))
 
 onNewBlockLoaded(data => {
-    console.log(data)
     if (new BN(data.data.newBlockFeed.number).isGreaterThanOrEqualTo(new BN(props.blockRef))) {
         subscriptionEnabled.value = false
         refetchBlockDetails()

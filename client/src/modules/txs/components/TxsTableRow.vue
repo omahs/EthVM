@@ -133,7 +133,7 @@ import BN from 'bignumber.js'
 import { Tx } from '../types'
 import AppTooltip from '@core/components/ui/AppTooltip.vue'
 import { computed } from 'vue'
-import { eth } from '@core/helper'
+import { eth, timeAgo } from '@core/helper'
 import { useDisplay } from 'vuetify/lib/framework.mjs'
 import { formatNumber, formatNonVariableEthValue } from '@core/helper/number-format-helper'
 
@@ -163,7 +163,7 @@ const transaction = computed<Tx>(() => {
         block: formatNumber(new BN(tx['block'])),
         from: tx['from'],
         to: tx['to'],
-        timestamp: new Date(tx['timestamp'] * 1e3).toDateString(),
+        timestamp: timeAgo(new Date(tx['timestamp'] * 1e3)),
         fee: formatNonVariableEthValue(new BN(tx['txFee'])),
         value: formatNonVariableEthValue(new BN(props.tx ? props.tx.value : '')),
         status: tx['status'] != null ? tx['status'] : false

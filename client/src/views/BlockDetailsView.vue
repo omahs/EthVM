@@ -45,7 +45,7 @@ interface ComponentState {
 const state: ComponentState = reactive({
     errorMessages: [],
     blockNumber: '',
-    isMined: false
+    isMined: true
 })
 
 const props = defineProps({
@@ -68,7 +68,6 @@ onMounted(() => {
     window.scrollTo(0, 0)
     if (!isHash.value) {
         state.blockNumber = props.blockRef.toString()
-        console.log(state)
     }
 })
 

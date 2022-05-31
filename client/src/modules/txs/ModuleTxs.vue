@@ -34,7 +34,7 @@ import AppNewUpdate from '@core/components/ui/AppNewUpdate.vue'
 import AppPaginateHasMore from '@core/components/ui/AppPaginateHasMore.vue'
 import AppPaginate from '@core/components/ui/AppPaginate.vue'
 import { useGetAllTxsQuery, useNewTransfersCompleteFeedSubscription, useGetBlockTransfersQuery } from './apollo/transfersQuery.generated'
-import { computed, reactive, watch } from 'vue'
+import { computed, onMounted, reactive, watch } from 'vue'
 import { useResult } from '@vue/apollo-composable'
 import TxsTable from '@module/txs/components/TxsTable.vue'
 import BN from 'bignumber.js'
@@ -163,7 +163,7 @@ const {
 
 const {
     loading: loadingBlockTxs,
-    result: getAlBlockTransfersResult,
+    result: getAllBlockTransfersResult,
     refetch: refetchBlockTransfers
 } = useGetBlockTransfersQuery(
     {
@@ -178,14 +178,14 @@ const {
 const { onResult: onNewTransferLoaded } = useNewTransfersCompleteFeedSubscription()
 
 const allEthTransfers = useResult(getAllEthTransfers, null, data => data.getAllEthTransfers)
-const allBlockTransfersResult = useResult(getAlBlockTransfersResult, null, data => data.getBlockTransfers)
+const allBlockTransfersResult = useResult(getAllBlockTransfersResult, null, data => data.getBlockTransfers)
 
 onTxsArrayLoaded(result => {
     state.initialLoad = false
 })
 
 onNewTransferLoaded(result => {
-    if (result.data.newTransfersCompleteFeed.type === 'ETH') {
+    if (result?.data.newTransfersCompleteFeed.type === 'ETH') {
         if (isHome.value) {
             refetchTxArray()
         } else {
@@ -234,6 +234,12 @@ const setPage = async (page: number, reset = false): Promise<boolean> => {
     state.index = page
     return true
 }
+
+onMounted(() => {
+    state.initialLoad = true
+    state.hasError = false
+    refetchBlockTransfers()
+})
 
 watch(
     () => props.blockRef,
