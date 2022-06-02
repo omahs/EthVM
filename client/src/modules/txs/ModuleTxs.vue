@@ -27,9 +27,9 @@
 </template>
 
 <script setup lang="ts">
-import AppTableTitle from '@/core/components/ui/AppTableTitle.vue'
-import AppNewUpdate from '@/core/components/ui/AppNewUpdate.vue'
-import AppPaginateHasMore from '@/core/components/ui/AppPaginateHasMore.vue'
+import AppTableTitle from '@/core/components/AppTableTitle.vue'
+import AppNewUpdate from '@/core/components/AppNewUpdate.vue'
+import AppPaginateHasMore from '@/core/components/AppPaginateHasMore.vue'
 import { useGetAllTxsQuery, useNewTransfersCompleteFeedSubscription } from './apollo/transfersQuery.generated'
 import { computed, reactive } from 'vue'
 import { useResult } from '@vue/apollo-composable'
