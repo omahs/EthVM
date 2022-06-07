@@ -38,9 +38,12 @@ import {
 import { ErrorMessageBlock } from '@/modules/block/models/ErrorMessagesForBlock'
 import { excpBlockNotMined } from '@/apollo/errorExceptions'
 import { FormattedNumber, formatNumber, formatVariableUnitEthValue } from '@/core/helper/number-format-helper'
-import { useNewBlockFeedSubscription } from '@core/mixins/newBlockFeed.generated'
-import { useBlockSubscription } from '@core/mixins/newBlock.mixin'
+import { useNewBlockFeedSubscription } from '@core/composables/NewBlock/newBlockFeed.generated'
+import { useBlockSubscription } from '@core/composables/NewBlock/newBlock.composable'
+import { useStore } from '@/store'
 import { useQuery } from '@vue/apollo-composable'
+
+const store = useStore()
 
 const props = defineProps({
     blockRef: String,
@@ -289,4 +292,15 @@ const emitErrorState = (val: boolean): void => {
     state.hasError = val
     emit('errorDetails', state.hasError, ErrorMessageBlock.details)
 }
+
+onMounted(() => {
+    refetchBlockDetails()
+})
+
+watch(
+    () => props.blockRef,
+    data => {
+        refetchBlockDetails({ blockRef: parseInt(data) })
+    }
+)
 </script>

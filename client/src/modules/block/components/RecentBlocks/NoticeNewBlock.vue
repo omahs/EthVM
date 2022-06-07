@@ -7,7 +7,7 @@
 
 <script setup lang="ts">
 import { computed, reactive } from 'vue'
-import { useBlockSubscription } from '@core/mixins/newBlock.mixin'
+import { useBlockSubscription } from '@core/composables/NewBlock/newBlock.composable'
 
 const props = defineProps({
     pageId: {

@@ -5,6 +5,9 @@
 </template>
 
 <script setup lang="ts">
+const props = defineProps({
+    tokens: Array
+})
 // Components
 import BlockStatsModule from '@module/block/ModuleBlockStats.vue'
 import RecentBlocks from '@module/block/ModuleRecentBlocks.vue'
