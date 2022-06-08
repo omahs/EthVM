@@ -13,6 +13,24 @@ module.exports = defineConfig({
                 {
                     test: /\.graphql$/,
                     use: 'graphql-tag/loader'
+                },
+                {
+                    test: /\.vue$/,
+                    loader: 'vue-loader',
+                    options: {
+                        reactivityTransform: true
+                    }
+                },
+                {
+                    test: /.ts$/,
+                    use: [
+                        {
+                            loader: 'ts-loader',
+                            options: {
+                                appendTsSuffixTo: [/.vue$/]
+                            }
+                        }
+                    ]
                 }
             ]
         },

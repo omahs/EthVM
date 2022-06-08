@@ -6,7 +6,8 @@
             </v-btn>
             <v-spacer />
             <v-col cols="4">
-                <app-search />
+                <module-search />
+                <!-- <app-search /> -->
             </v-col>
         </v-row>
     </v-app-bar>
@@ -14,6 +15,8 @@
 
 <script setup lang="ts">
 import { useDisplay } from 'vuetify/lib/framework.mjs'
+// import AppSearch from './AppSearch.vue'
+import ModuleSearch from '@module/search/ModuleSearch.vue'
 /* Vuetify BreakPoints */
 const { md, xs, sm } = useDisplay()
 /*Define Emit Events */
