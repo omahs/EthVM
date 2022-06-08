@@ -7,6 +7,7 @@ const eth = {
         const n = Number(raw)
         return !isNaN(n) && Number.isInteger(n) && n >= 0 && isNum
     },
+    isValidAddress: (address: any): boolean => address && web3.utils.isHexStrict(address) && web3.utils.isAddress(address),
     toCheckSum: (value: string) => {
         return value ? (value.length === 42 ? web3Utils.toChecksumAddress(value) : value) : ''
     }
