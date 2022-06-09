@@ -241,6 +241,15 @@ onMounted(() => {
     state.hasError = false
     refetchBlockTransfers()
 })
+
+watch(
+    () => props.blockRef,
+    () => {
+        state.initialLoad = true
+        state.hasError = false
+        refetchBlockTransfers({ _number: parseInt(props.blockRef) })
+    }
+)
 </script>
 <style scoped lang="css">
 .tx-filter-select-container {

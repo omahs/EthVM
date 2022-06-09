@@ -14,7 +14,7 @@
                 :address-ref="addressRef"
                 :token-details="tokenDetails"
                 :is-nft="isNft"
-                :is-loading="loadingTokenDetails || hasError"
+                :is-loading="loadingTokenDetails || state.hasError"
                 @errorDetails="emitErrorState"
             />
         </div>
@@ -31,23 +31,19 @@
                 :address-ref="addressRef"
                 :holder-details="tokenDetails"
                 :token-details="tokenDetails ? tokenDetails['tokenInfo'] : {}"
-                :is-loading="loadingTokenDetails || hasError"
+                :is-loading="loadingTokenDetails || state.hasError"
                 @errorDetails="emitErrorState"
             />
         </div>
     </div>
 </template>
 
-<script lang="ts">
-import { reactive, computed, onMounted, ref } from 'vue'
+<script setup lang="ts">
+import { reactive, computed, onMounted } from 'vue'
 import TokenDetailsList from '@module/tokens/components/TokenDetailsList.vue'
-import BigNumber from 'bignumber.js'
-import { getTokenInfoByContract, getERC20TokenBalance } from '@app/modules/tokens/handlers/tokenDetails/tokenDetails.graphql'
-import { GetErc20TokenBalanceQuery as TokenOwnerInfo, GetTokenInfoByContractQuery as TokenInfo, useGetErc20TokenBalanceQuery, useGetTokenInfoByContractQuery } from '@module/tokens/apollo/tokenDetails.generated'
+import { useGetErc20TokenBalanceQuery, useGetTokenInfoByContractQuery } from '@module/tokens/apollo/tokenDetails.generated'
 import { eth } from '@core/helper'
 import { ErrorMessageToken } from '@module/tokens/models/ErrorMessagesForTokens'
-
-const MAX_ITEMS = 10
 
 const props = defineProps({
     addressRef: {
@@ -73,7 +69,7 @@ interface ComponentState {
 const state: ComponentState = reactive({
     address: '',
     hasError: false,
-    isNft: true,
+    isNft: true
 })
 
 const emit = defineEmits(['errorDetails'])
@@ -87,14 +83,20 @@ onMounted(() => {
     window.scrollTo(0, 0)
 })
 
-const { loading: loadingTokenDetails, onError: onTokenDetailsError, result } = props.isHolder ? useGetErc20TokenBalanceQuery({
-    contract: props.addressRef,
-    owner: props.holderAddress
-}) : useGetTokenInfoByContractQuery({
-    contract: props.addressRef
-})
+const {
+    loading: loadingTokenDetails,
+    onError: onTokenDetailsError,
+    result
+} = props.isHolder
+    ? useGetErc20TokenBalanceQuery({
+          contract: props.addressRef,
+          owner: props.holderAddress
+      })
+    : useGetTokenInfoByContractQuery({
+          contract: props.addressRef
+      })
 
-onTokenDetailsError((error) => {
+onTokenDetailsError(error => {
     const newError = JSON.stringify(error.message)
     if (newError.includes('Token not found')) {
         emitErrorState(true, ErrorMessageToken.notFound)
@@ -103,9 +105,12 @@ onTokenDetailsError((error) => {
     }
 })
 
-const tokenDetails = computed<TokenOwnerInfo | TokenInfo | null>(() => {
+const tokenDetails = computed<any>(() => {
     if (result && result.value) {
-        return result.value
+        if (props.isHolder) {
+            return result.value.getERC20TokenBalance
+        }
+        return result.value.getTokenInfoByContract
     }
     return null
 })
@@ -118,42 +123,6 @@ COMPUTED PROPERTIES:
 
 const isValid = computed<boolean>(() => {
     return eth.isValidAddress(props.addressRef)
-})
-
-const totalSupply = computed<BigNumber | undefined>(() => {
-    if (props.isHolder) {
-        return tokenDetails.value?.tokenInfo.totalSupply
-    }
-    return tokenDetails.value?.tokenInfo ? tokenDetails.value?.tokenInfo.totalSupply : tokenDetails.value?.totalSupply
-})
-
-const tokenLabel = computed<string>(() => {
-    if (!tokenDetails.value) {
-        return tokenLabelDefault.value
-    }
-    if (symbol.value) {
-        return symbol.value.toUpperCase()
-    } else if (name.value) {
-        return name.value.toUpperCase()
-    }
-    return tokenLabelDefault.value
-})
-
-const tokenLabelDefault = computed<string>(() => {
-    const n = props.addressRef.length
-    return `Token: ${props.addressRef.slice(0, 4)}...${props.addressRef.slice(n - 4, n)}`
-})
-
-const decimals = computed<number | null>(() => {
-    return tokenDetails.value?.tokenInfo ? tokenDetails.value?.tokenInfo.decimals : tokenDetails.value?.decimals
-})
-
-const symbol = computed<string | null>(() => {
-    return tokenDetails.value?.tokenInfo ? tokenDetails.value?.tokenInfo.symbol : tokenDetails.value?.symbol
-})
-
-const name = computed<string | null>(() => {
-    return tokenDetails.value?.tokenInfo ? tokenDetails.value?.tokenInfo.name : tokenDetails.value?.name
 })
 
 /*
@@ -170,9 +139,5 @@ METHODS:
 const emitErrorState = (val: boolean, message: ErrorMessageToken): void => {
     state.hasError = val
     emit('errorDetails', val, message)
-}
-
-const getTokenType = (val: boolean) => {
-    state.isNft = val
 }
 </script>

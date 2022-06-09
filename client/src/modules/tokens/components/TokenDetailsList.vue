@@ -1,402 +1,296 @@
 <template>
-    <v-layout row wrap justify-start class="mb-4">
-        <v-flex xs12>
-            <app-details-list :title="title" :details="details" :is-loading="isLoading || hasError" :max-items="10" class="mb-4">
+    <v-row row wrap justify="start" class="mb-4">
+        <v-col xs="12">
+            <app-details-list :title="title" :details="details" :is-loading="isLoading || state.hasError" :max-items="10" class="mb-4">
                 <template #title>
-                    <v-layout grid-list-xs row align-center justify-space-between fill-height pl-4 pr-2>
-                        <v-flex>
-                            <v-layout grid-list-xs row align-center justify-start class="token-header">
+                    <v-row grid-list-xs row align="center" justify="space-between" class="fill-height pl-4 pr-2 my-0">
+                        <v-col>
+                            <v-row grid-list-xs row align="center" justify="start" class="token-header">
                                 <div class="token-header-image">
                                     <v-img :src="image" contain @error="imgLoadFail" />
                                 </div>
                                 <v-card-title class="title font-weight-bold pl-3">{{ title }}</v-card-title>
-                            </v-layout>
-                        </v-flex>
-                        <v-flex v-if="!isNft" text-xs-right py-0>
-                            <fav-handler-heart-actions :symbol="symbol" :address="address" />
-                        </v-flex>
-                    </v-layout>
+                            </v-row>
+                        </v-col>
+                    </v-row>
                     <v-divider class="lineGrey" />
                 </template>
             </app-details-list>
-        </v-flex>
-    </v-layout>
+        </v-col>
+    </v-row>
 </template>
 
-<script lang="ts">
-import { Detail } from '@app/core/components/props'
-import AppDetailsList from '@app/core/components/ui/AppDetailsList.vue'
-import { Hex } from '@app/core/models'
-import { Component, Prop, Mixins } from 'vue-property-decorator'
+<script setup lang="ts">
+import { Detail } from '@core/components/props'
+import AppDetailsList from '@core/components/ui/AppDetailsList.vue'
+import { Hex } from '@core/models'
 import BN from 'bignumber.js'
-import { ConfigHelper } from '@app/core/helper/config-helper'
-import { NumberFormatMixin } from '@app/core/components/mixins/number-format.mixin'
-import { FormattedNumber } from '@app/core/helper/number-format-helper'
-import { getLatestPrices_getLatestPrices as TokenMarketData } from '@app/core/components/mixins/CoinData/apolloTypes/getLatestPrices'
-import { CoinData } from '@app/core/components/mixins/CoinData/CoinData.mixin'
-import { ERC20TokenOwnerDetails as TokenOwnerInfo } from '@app/modules/tokens/handlers/tokenDetails/apolloTypes/ERC20TokenOwnerDetails.ts'
-import { TokenDetails as TokenInfo } from '@app/modules/tokens/handlers/tokenDetails/apolloTypes/TokenDetails'
-import { ErrorMessageToken } from '@app/modules/tokens/models/ErrorMessagesForTokens'
-import FavHandlerHeartActions from '@app/modules/favorite-tokens/handlers/FavHandlerHeartActions.vue'
-@Component({
-    components: {
-        AppDetailsList,
-        FavHandlerHeartActions
+import { ConfigHelper } from '@core/helper/config-helper'
+import { formatFloatingPointValue, formatNumber, FormattedNumber, formatUsdValue } from '@core/helper/number-format-helper'
+import { useCoinData } from '@core/composables/CoinData/coinData.composable'
+import { GetErc20TokenBalanceQuery as TokenOwnerInfo, GetTokenInfoByContractQuery as TokenInfo } from '@module/tokens/apollo/tokenDetails.generated'
+import { ErrorMessageToken } from '@module/tokens/models/ErrorMessagesForTokens'
+import { computed } from 'vue'
+
+interface TokenMarketData {
+    __typename?: 'TokenMarketInfo'
+    id: string
+    symbol: string
+    name: string
+    image: string
+    contract?: string | null
+    current_price?: number | null
+    market_cap?: number | null
+    total_volume?: number | null
+    total_supply?: string | null
+    price_change_percentage_24h?: number | null
+}
+
+interface PropType {
+    addressRef: string
+    isLoading: boolean
+    tokenDetails: TokenInfo
+    holderDetails: TokenOwnerInfo
+}
+
+const props = defineProps<PropType>()
+
+interface ComponentState {
+    isRopsten: boolean
+    hasError: boolean
+    imageExists: boolean
+}
+
+const state: ComponentState = {
+    isRopsten: ConfigHelper.isRopsten,
+    hasError: false,
+    imageExists: true
+}
+
+const emit = defineEmits(['errorDetails'])
+
+/*
+===================================================================================
+  Methods:
+===================================================================================
+*/
+/**
+ * Emit error to Sentry
+ * @param val {Boolean}
+ */
+const emitErrorState = (val: boolean): void => {
+    state.hasError = val
+    emit('errorDetails', val, ErrorMessageToken.details)
+}
+
+/**
+ * Image loading failed catcher
+ */
+const imgLoadFail = (): void => {
+    state.imageExists = false
+}
+
+/*
+===================================================================================
+  Computed Values
+===================================================================================
+*/
+const { getEthereumTokenByContract } = useCoinData()
+const tokenData = computed<TokenMarketData | false>(() => {
+    if (props.addressRef) {
+        try {
+            emitErrorState(false)
+            return getEthereumTokenByContract(props.addressRef)
+        } catch (error) {
+            emitErrorState(true)
+        }
+    }
+    return false
+})
+
+/**
+ * Create properly-formatted title from tokenDetails
+ *
+ * @return {String} - Title for details list
+ */
+const title = computed<string>(() => {
+    let name = 'Token'
+    let symbol = ''
+    let holder = ''
+    if (props.tokenDetails && !props.isLoading) {
+        name = props.tokenDetails.name === null ? name : props.tokenDetails.name
+        symbol = props.tokenDetails.symbol === null || !props.tokenDetails.symbol ? symbol : `(${props.tokenDetails.symbol.toUpperCase()}) `
+    }
+    if (props.holderDetails && props.holderDetails.owner) {
+        holder = `- Filtered by Holder`
+    }
+    return `${name} ${symbol} ${holder}`
+})
+
+const image = computed<string>(() => {
+    return !(tokenData.value && tokenData.value.image && state.imageExists) ? require('@/assets/icon-token.png') : tokenData.value.image
+})
+
+/**
+ * Properly format the Details[] array for the details table.
+ * If the data hasn't been loaded yet, then only include the titles in the details.
+ */
+const details = computed<Detail[]>(() => {
+    return props.holderDetails ? holderDetailsList.value : tokenDetailsList.value
+})
+
+/**
+ * Get details list for token detail view
+ */
+const tokenDetailsList = computed<Detail[]>(() => {
+    const details = [contractDetail.value]
+    contractDecimalsDetail.value.detail ? details.push(contractDecimalsDetail.value) : null
+    if (props.holderDetails && props.holderDetails.owner && contractOwnerDetail.value.detail) {
+        details.push(contractOwnerDetail.value)
+    }
+    if (!props.isRopsten && priceDetail.value.detail) {
+        details.push(priceDetail.value)
+    }
+    supplyDetail.value.detail ? details.push(supplyDetail.value) : null
+    if (!state.isRopsten) {
+        marketCapDetail.value.detail ? details.push(marketCapDetail.value) : null
+        volumeDetail.value.detail ? details.push(volumeDetail.value) : null
+    }
+    return details
+})
+
+/**
+ * Get details list for holder detail view
+ */
+const holderDetailsList = computed<Detail[]>(() => {
+    const details = [holderDetail.value, holderBalanceDetail.value]
+    if (!state.isRopsten && holderUsdDetail.value.detail) {
+        details.push(holderUsdDetail.value)
+    }
+    // details.push(holderTransfersDetail.value)
+    return details.concat(tokenDetailsList.value)
+})
+
+const contractDetail = computed<Detail[]>(() => {
+    const detail: Detail = { title: 'Contract' }
+    if (!props.isLoading && props.tokenDetails) {
+        detail.detail = new Hex(props.tokenDetails.contract).toString()
+        detail.link = `/address/${new Hex(props.tokenDetails.contract).toString()}`
+        detail.copy = true
+        detail.toChecksum = true
+    }
+    return detail
+})
+
+const contractOwnerDetail = computed<Detail[]>(() => {
+    const detail: Detail = { title: 'Owner' }
+    if (!props.isLoading && props.holderDetails && props.holderDetails.owner) {
+        detail.detail = props.holderDetails.owner
+        detail.link = `/address/${props.holderDetails.owner}`
+        detail.copy = true
+        detail.toChecksum = true
+    }
+    return detail
+})
+
+const contractDecimalsDetail = computed<Detail[]>(() => {
+    return {
+        title: 'Decimals',
+        detail: !props.isLoading && props.tokenDetails && props.tokenDetails.decimals != null ? props.tokenDetails.decimals : undefined
     }
 })
-export default class TokenDetailsList extends Mixins(NumberFormatMixin, CoinData) {
-    /*
-  ===================================================================================
-    Props
-  ===================================================================================
-  */
 
-    @Prop(String) addressRef!: string // Token contract address
-    @Prop(Object) tokenDetails!: TokenInfo
-    @Prop(Boolean) isLoading!: boolean
-    @Prop(Boolean) isNft!: boolean
-    @Prop(Object) holderDetails!: TokenOwnerInfo
-    /*
-  ===================================================================================
-    Initial Values
-  ===================================================================================
-  */
-    // icons = {
-    //     blog: 'fab fa-ethereum',
-    //     chat: 'fab fa-ethereum',
-    //     facebook: 'fab fa-facebook',
-    //     forum: 'fas fa-comments',
-    //     github: 'fab fa-github',
-    //     gitter: 'fab fa-gitter',
-    //     instagram: 'fab fa-instagram',
-    //     linkedin: 'fab fa-linkedin',
-    //     reddit: 'fab fa-reddit',
-    //     slack: 'fab fa-slack',
-    //     telegram: 'fab fa-telegram',
-    //     twitter: 'fab fa-twitter',
-    //     youtube: 'fab fa-youtube'
-    // }
-    // tokenData: TokenMarketData | null = null
-    isRopsten = ConfigHelper.isRopsten
-    hasError = false
-    imageExists = true
-    /*
-  ===================================================================================
-        LifeCycle:
-  ===================================================================================
-    */
-    // mounted() {
-    //     if (this.addressRef) {
-    //         this.$CD
-    //             .getEthereumTokenByContract(this.addressRef)
-    //             .then(data => {
-    //                 this.tokenData = data ? data : null
-    //             })
-    //             .catch(error => {
-    //                 this.error = `${this.$t('message.no-data')}`
-    //             })
-    //     }
-    // }
-
-    /*
-    ===================================================================================
-      Methods:
-    ===================================================================================
-    */
-    /**
-     * Emit error to Sentry
-     * @param val {Boolean}
-     */
-    emitErrorState(val: boolean): void {
-        this.hasError = val
-        this.$emit('errorDetails', val, ErrorMessageToken.details)
-    }
-
-    /**
-     * Image loading failed catcher
-     */
-    imgLoadFail(): void {
-        this.imageExists = false
-    }
-
-    /*
-  ===================================================================================
-    Computed Values
-  ===================================================================================
-  */
-    get symbol(): string | null {
-        return this.tokenDetails ? this.tokenDetails.symbol : ''
-    }
-
-    get address(): string | null {
-        return this.tokenDetails ? this.tokenDetails.contract : ''
-    }
-    get tokenData(): TokenMarketData | false {
-        if (this.addressRef) {
-            try {
-                this.emitErrorState(false)
-                return this.getEthereumTokenByContract(this.addressRef)
-            } catch (error) {
-                this.emitErrorState(true)
-            }
-        }
-        return false
-    }
-
-    /**
-     * Create properly-formatted title from tokenDetails
-     *
-     * @return {String} - Title for details list
-     */
-    get title(): string {
-        let name = this.$tc('token.name', 1)
-        let symbol = ''
-        let holder = ''
-        if (this.tokenDetails && !this.isLoading) {
-            name = this.tokenDetails.name === null ? name : this.tokenDetails.name
-            symbol = this.tokenDetails.symbol === null || !this.tokenDetails.symbol ? symbol : `(${this.tokenDetails.symbol.toUpperCase()}) `
-        }
-        if (this.holderDetails && this.holderDetails.owner) {
-            holder = `- ${this.$t('token.filtered')}`
-        }
-        return `${name} ${symbol} ${holder}`
-    }
-
-    get image(): string {
-        return !(this.tokenData && this.tokenData.image && this.imageExists) ? require('@/assets/icon-token.png') : this.tokenData.image
-    }
-
-    /**
-     * Properly format the Details[] array for the details table.
-     * If the data hasn't been loaded yet, then only include the titles in the details.
-     */
-    get details(): Detail[] {
-        return this.holderDetails ? this.holderDetailsList : this.tokenDetailsList
-    }
-
-    /**
-     * Get details list for token detail view
-     */
-    get tokenDetailsList(): Detail[] {
-        const details = [this.contractDetail]
-        this.contractDecimalsDetail.detail ? details.push(this.contractDecimalsDetail) : null
-        if (this.holderDetails && this.holderDetails.owner && this.contractOwnerDetail.detail) {
-            details.push(this.contractOwnerDetail)
-        }
-        if (!this.holderDetails) {
-            // details.push(this.totalHoldersDetail)
-        }
-        if (!this.isRopsten && this.priceDetail.detail) {
-            details.push(this.priceDetail)
-        }
-        this.supplyDetail.detail ? details.push(this.supplyDetail) : null
-        if (!this.isRopsten) {
-            this.marketCapDetail.detail ? details.push(this.marketCapDetail) : null
-            this.volumeDetail.detail ? details.push(this.volumeDetail) : null
-        }
-        // details.push(this.websiteDetail, this.supportDetail, this.socialDetail)
-        return details
-    }
-
-    /**
-     * Get details list for holder detail view
-     */
-    get holderDetailsList(): Detail[] {
-        const details = [this.holderDetail, this.holderBalanceDetail]
-        if (!this.isRopsten && this.holderUsdDetail.detail) {
-            details.push(this.holderUsdDetail)
-        }
-        // details.push(this.holderTransfersDetail)
-        return details.concat(this.tokenDetailsList)
-    }
-
-    get contractDetail(): Detail {
-        const detail: Detail = { title: this.$tc('contract.name', 1) }
-        if (!this.isLoading && this.tokenDetails) {
-            detail.detail = new Hex(this.tokenDetails.contract).toString()
-            detail.link = `/address/${new Hex(this.tokenDetails.contract).toString()}`
-            detail.copy = true
-            detail.toChecksum = true
-        }
-        return detail
-    }
-
-    get contractOwnerDetail(): Detail {
-        const detail: Detail = { title: this.$t('token.owner') }
-        if (!this.isLoading && this.holderDetails && this.holderDetails.owner) {
-            detail.detail = this.holderDetails.owner
-            detail.link = `/address/${this.holderDetails.owner}`
-            detail.copy = true
-            detail.toChecksum = true
-        }
-        return detail
-    }
-
-    get contractDecimalsDetail(): Detail {
-        return {
-            title: this.$t('token.decimals'),
-            detail: !this.isLoading && this.tokenDetails && this.tokenDetails.decimals != null ? this.tokenDetails.decimals : undefined
+const priceDetail = computed<Detail[]>(() => {
+    const detail: Detail = { title: 'Price' }
+    if (!props.isLoading && tokenData.value) {
+        const priceFormatted = formatUsdValue(new BN(tokenData.value.current_price || 0))
+        detail.detail = priceFormatted.value
+        detail.priceChange = tokenData.value.price_change_percentage_24h
+        if (priceFormatted.tooltipText) {
+            detail.tooltip = priceFormatted.tooltipText
         }
     }
+    return detail
+})
 
-    get priceDetail(): Detail {
-        const detail: Detail = { title: this.$i18n.tc('price.name', 1) }
-        if (!this.isLoading && this.tokenData) {
-            const priceFormatted = this.formatUsdValue(new BN(this.tokenData.current_price || 0))
-            detail.detail = priceFormatted.value
-            detail.priceChange = this.tokenData.price_change_percentage_24h
-            if (priceFormatted.tooltipText) {
-                detail.tooltip = priceFormatted.tooltipText
-            }
-        }
-        return detail
+const supplyDetail = computed<Detail[]>(() => {
+    let supply: number | undefined = undefined
+    if (tokenData.value && tokenData.value.total_supply) {
+        supply = new BN(tokenData.value.total_supply).toNumber()
+    }
+    return {
+        title: 'Total supply',
+        detail: !props.isLoading && supply ? formatNumber(supply) : undefined
+    }
+})
+
+const marketCapDetail = computed<Detail[]>(() => {
+    return {
+        title: 'Market Cap',
+        detail: !props.isLoading && tokenData.value && tokenData.value.market_cap ? formatNumber(tokenData.value.market_cap) : undefined
+    }
+})
+
+const volumeDetail = computed<Detail[]>(() => {
+    return {
+        title: 'Volume',
+        detail: !props.isLoading && tokenData.value && tokenData.value.total_volume ? formatNumber(tokenData.value.total_volume) : undefined
+    }
+})
+
+const holderDetail = computed<Detail[]>(() => {
+    const detail: Detail = { title: 'Holder' }
+    if (!props.isLoading && props.holderDetails && props.holderDetails.owner) {
+        detail.detail = props.holderDetails.owner
+        detail.link = `/address/${props.holderDetails.owner}`
+        detail.copy = true
+        detail.toChecksum = true
+    }
+    return detail
+})
+
+const holderBalanceDetail = computed<Detail[]>(() => {
+    const detail: Detail = { title: 'Balance' }
+    if (!props.isLoading && props.tokenDetails && props.holderDetails) {
+        const symbol = props.tokenDetails.symbol === null || !props.tokenDetails.symbol ? '' : ` ${props.tokenDetails.symbol.toUpperCase()}`
+        detail.detail = `${balance.value.value}${symbol}`
+        detail.tooltip = balance.value.tooltipText ? balance.value.tooltipText : undefined
+    }
+    return detail
+})
+
+const holderUsdDetail = computed<Detail[]>(() => {
+    return {
+        title: 'Total USD Value',
+        detail: !props.isLoading && props.tokenDetails ? balanceUsd.value : undefined
+    }
+})
+
+const balanceUsd = computed<string | undefined>(() => {
+    if (!props.holderDetails) {
+        return ''
     }
 
-    get supplyDetail(): Detail {
-        let supply: number | undefined = undefined
-        if (this.tokenData && this.tokenData.total_supply) {
-            supply = new BN(this.tokenData.total_supply).toNumber()
-        }
-        return {
-            title: this.$i18n.t('token.supply'),
-            detail: !this.isLoading && supply ? this.formatNumber(supply) : undefined
-            // tooltip:
-            //     !this.isLoading && this.tokenDetails && this.tokenDetails.totalSupply && this.tokenDetails.totalSupplyFormatted.tooltipText
-            //         ? this.tokenDetails.totalSupplyFormatted.tooltipText
-            //         : undefined
-        }
+    const decimals = props.tokenDetails.decimals
+    let n = new BN(props.holderDetails.balance)
+
+    if (decimals) {
+        n = n.div(new BN(10).pow(decimals))
     }
 
-    get marketCapDetail(): Detail {
-        return {
-            title: this.$i18n.t('token.market'),
-            detail: !this.isLoading && this.tokenData && this.tokenData.market_cap ? this.formatNumber(this.tokenData.market_cap) : undefined
-        }
+    return props.holderDetails.balance && tokenData.value && tokenData.value.current_price
+        ? formatUsdValue(n.multipliedBy(tokenData.value.current_price)).value
+        : undefined
+})
+
+const balance = computed<FormattedNumber>(() => {
+    const decimals = props.tokenDetails.decimals
+    let n = new BN(props.holderDetails.balance)
+    if (decimals) {
+        n = n.div(new BN(10).pow(decimals))
     }
-
-    get volumeDetail(): Detail {
-        return {
-            title: this.$i18n.t('token.volume'),
-            detail: !this.isLoading && this.tokenData && this.tokenData.total_volume ? this.formatNumber(this.tokenData.total_volume) : undefined
-        }
-    }
-
-    //TODO: Figure out where is website
-    get websiteDetail(): Detail {
-        const detail: Detail = { title: this.$i18n.t('token.website') }
-        // if (!this.isLoading && this.tokenData && this.tokenData.website) {
-        //     detail.detail = this.tokenData.website
-        //     detail.link = `${this.tokenData.website}`
-        // }
-        return detail
-    }
-
-    //TODO: Figure out where is email
-    get supportDetail(): Detail {
-        return {
-            title: this.$i18n.t('token.support')
-            // detail:
-            //     !this.isLoading && this.tokenDetails && this.tokenDetails.email
-            //         ? `<a href="mailto:${this.tokenDetails.email}" target="_BLANK">${this.tokenDetails.email}</a>`
-            //         : undefined
-        }
-    }
-
-    //TODO: Figure out where is socialDetail
-    get socialDetail(): Detail {
-        const detail: Detail = { title: this.$i18n.t('token.links') }
-        // if (!this.isLoading && this.tokenDetails && this.tokenDetails.social) {
-        //     detail.detail = Object.entries(this.tokenDetails.social)
-        //         .map(obj => {
-        //             const name = obj[0]
-        //             const url = obj[1]
-        //             if (url === null || url === '') {
-        //                 return ''
-        //             }
-        //             return `<a href="${url}" target="_BLANK"><i aria-hidden="true" class="v-icon primary--text ${this.icons[name]} pr-2 material-icons theme--light"></i></a>`
-        //         })
-        //         .reduce((a, b) => {
-        //             return `${a}${b}`
-        //         })
-        // }
-        return detail
-    }
-
-    //TODO: Figure out where totalHolders is
-    // get totalHoldersDetail(): Detail {
-    //     return {
-    //         title: this.$i18n.t('token.holder-total')
-    //         // detail: !this.isLoading && this.tokenDetails ? this.tokenDetails.holdersCount || 0 : undefined
-    //     }
-    // }
-
-    get holderDetail(): Detail {
-        const detail: Detail = { title: this.$tc('token.holder', 1) }
-        if (!this.isLoading && this.holderDetails && this.holderDetails.owner) {
-            detail.detail = this.holderDetails.owner
-            detail.link = `/address/${this.holderDetails.owner}`
-            detail.copy = true
-            detail.toChecksum = true
-        }
-        return detail
-    }
-
-    get holderBalanceDetail(): Detail {
-        const detail: Detail = { title: this.$t('common.balance') }
-        if (!this.isLoading && this.tokenDetails && this.holderDetails) {
-            const symbol = this.tokenDetails.symbol === null || !this.tokenDetails.symbol ? '' : ` ${this.tokenDetails.symbol.toUpperCase()}`
-            detail.detail = `${this.balance.value}${symbol}`
-            detail.tooltip = this.balance.tooltipText ? this.balance.tooltipText : undefined
-        }
-        return detail
-    }
-
-    get holderUsdDetail(): Detail {
-        return {
-            title: this.$t('usd.total'),
-            detail: !this.isLoading && this.tokenDetails ? this.balanceUsd : undefined
-        }
-    }
-
-    //TODO: Figure out where totalTransfer is
-    // get holderTransfersDetail(): Detail {
-    //     const { holderDetails, isLoading } = this
-    //     return {
-    //         title: this.$t('token.transfers')
-    //         detail: !isLoading && holderDetails && holderDetails.totalTransfersBN ? this.holderDetails.totalTransfersFormatted.value : undefined,
-    //         tooltip:
-    //             !isLoading && holderDetails && holderDetails.totalTransfersBN && this.holderDetails.totalTransfersFormatted.tooltipText
-    //                 ? this.holderDetails.totalTransfersFormatted.tooltipText
-    //                 : undefined
-    //     }
-    // }
-
-    get balanceUsd(): string | undefined {
-        if (!this.holderDetails) {
-            return ''
-        }
-
-        const decimals = this.tokenDetails.decimals
-        let n = new BN(this.holderDetails.balance)
-
-        if (decimals) {
-            n = n.div(new BN(10).pow(decimals))
-        }
-
-        return this.holderDetails.balance && this.tokenData && this.tokenData.current_price
-            ? this.formatUsdValue(n.multipliedBy(this.tokenData.current_price)).value
-            : undefined
-    }
-
-    get balance(): FormattedNumber {
-        const decimals = this.tokenDetails.decimals
-        let n = new BN(this.holderDetails.balance)
-        if (decimals) {
-            n = n.div(new BN(10).pow(decimals))
-        }
-        return this.formatFloatingPointValue(n)
-    }
-}
+    return formatFloatingPointValue(n)
+})
 </script>
 <style lang="scss" scoped>
 .token-header {

@@ -8,16 +8,14 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, provide } from 'vue'
 import { useCoinData } from '@core/composables/CoinData/coinData.composable'
 import TheAppNavigationDrawer from '@core/components/TheAppNavigationDrawer.vue'
 import { useStore } from '@/store'
 
 const store = useStore()
 
-const { ethereumTokens, filteredLatestPrice } = useCoinData()
+const { ethereumTokens } = useCoinData()
 store.tokenPrices = ethereumTokens
-console.log(store.tokenPrices)
 </script>
 
 <style lang="scss">

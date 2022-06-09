@@ -11,5 +11,5 @@ import { useDisplay } from 'vuetify/lib/framework.mjs'
 /* Vuetify BreakPoints */
 const { md, xs, sm } = useDisplay()
 /*Define Emit Events */
-const emit = defineEmits(['openDrawer'])
+defineEmits(['openDrawer'])
 </script>

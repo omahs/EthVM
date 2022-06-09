@@ -1,14 +1,14 @@
 <template>
     <v-container grid-list-lg class="mb-0">
-        <!-- <token-details v-if="!hasError" :address-ref="addressRef" :is-holder="state.isHolder" :holder-address="state.holderAddress" @errorDetails="setError" /> -->
+        <token-details v-if="!hasError" :address-ref="addressRef" :is-holder="state.isHolder" :holder-address="state.holderAddress" @errorDetails="setError" />
         <app-error v-else :has-error="hasError" :message="state.error" />
         <app-message :messages="state.errorMessages" />
     </v-container>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, watch } from 'vue'
-// import TokenDetails from '@module/tokens/ModuleTokenDetails.vue'
+import { computed, reactive, watch } from 'vue'
+import TokenDetails from '@module/tokens/ModuleTokenDetails.vue'
 import { ErrorMessageToken } from '@module/tokens/models/ErrorMessagesForTokens'
 import AppMessage from '@core/components/ui/AppMessage.vue'
 import AppError from '@core/components/ui/AppError.vue'
@@ -29,13 +29,14 @@ interface ComponentState {
     isHolder: boolean
     hasErrorHandler: boolean
 }
+const route = useRoute()
 
 const state: ComponentState = reactive({
     errorMessages: [],
-    holderAddress: '',
+    holderAddress: route.query,
     error: '',
     hasErrorHandler: false,
-    isHolder: true
+    isHolder: false
 })
 
 const isValid = computed<boolean>(() => {
@@ -46,18 +47,15 @@ const hasError = computed<boolean>(() => {
     return state.error !== ''
 })
 
-const route = useRoute()
-onMounted(() => {
-    const query = route.query
-    if (query.holder) {
-        state.isHolder = true
-        state.holderAddress = query.holder as string
-    }
+const query = route.query
+if (query.holder) {
+    state.isHolder = true
+    state.holderAddress = query.holder as string
+}
 
-    if (!isValid.value) {
-        state.error = 'This is not a valid token address'
-    }
-})
+if (!isValid.value) {
+    state.error = 'This is not a valid token address'
+}
 
 watch(route, () => {
     const query = route.query

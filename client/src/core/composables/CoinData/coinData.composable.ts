@@ -43,5 +43,32 @@ export function useCoinData() {
         return []
     })
 
-    return { ethereumTokens, filteredLatestPrice }
+    const tokensMarketInfo = computed<Map<string, TokenMarketData>>(() => {
+        const marketInfo = new Map()
+        if (result.value && result.value?.getLatestPrices.length > 0) {
+            result.value?.getLatestPrices.forEach(token => {
+                if (token?.id !== 'ethereum' && hasData(token)) {
+                    marketInfo.set(token?.contract?.toLowerCase(), token)
+                }
+            })
+        }
+        return marketInfo
+    })
+
+    /**
+     * Generate ethereum tokens by contract
+     * @param contract String[]
+     * @returns {Map} TokenMarketData or {Boolean}
+     */
+    const getEthereumTokenByContract = (contract: string): TokenMarketData | false => {
+        if (!loading.value) {
+            const token = tokensMarketInfo.value.get(contract.toLowerCase())
+            if (token) {
+                return token
+            }
+        }
+        return false
+    }
+
+    return { ethereumTokens, filteredLatestPrice, getEthereumTokenByContract }
 }
