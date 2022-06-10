@@ -101,8 +101,6 @@
 
 <script setup lang="ts">
 import AppTransformHash from '@core/components/ui/AppTransformHash.vue'
-// import { NumberFormatMixin } from '@app/core/components/mixins/number-format.mixin'
-// import AppTimeAgo from '@app/core/components/ui/AppTimeAgo.vue'
 import { eth, timeAgo } from '@core/helper'
 import BN from 'bignumber.js'
 

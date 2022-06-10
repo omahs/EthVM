@@ -32,6 +32,8 @@ import { eth } from '@/core/helper'
 import { Detail } from '@/core/components/props'
 import {
     BlockDetailsFragment as BlockDetailsType,
+    GetBlockByHashDocument,
+    GetBlockByNumberDocument,
     useGetBlockByNumberQuery,
     useGetLastBlockNumberQuery
 } from '@/modules/block/apollo/BlockDetails/blockDetails.generated'
@@ -40,6 +42,7 @@ import { excpBlockNotMined } from '@/apollo/errorExceptions'
 import { FormattedNumber, formatNumber, formatVariableUnitEthValue } from '@/core/helper/number-format-helper'
 import { useNewBlockFeedSubscription } from '@core/mixins/newBlockFeed.generated'
 import { useBlockSubscription } from '@core/mixins/newBlock.mixin'
+import { useQuery } from '@vue/apollo-composable'
 
 const props = defineProps({
     blockRef: String,
@@ -85,7 +88,7 @@ const blockDetails = computed<Detail[]>(() => {
         {
             title: 'Total Rewards',
             detail: `${rewards.value.value} ${rewards.value.unit}`,
-            tooltip: `${rewards.value.tooltipText} ETH` || undefined
+            tooltip: rewards.value.tooltipText ? `${rewards.value.tooltipText} ETH` : undefined
         },
         {
             title: 'Txs Fees',
@@ -183,7 +186,8 @@ const {
     onError: onBlockDetailsError,
     loading: loadingBlockDetails,
     refetch: refetchBlockDetails
-} = useGetBlockByNumberQuery(
+} = useQuery(
+    props.isHash ? GetBlockByHashDocument : GetBlockByNumberDocument,
     { blockRef: blockDetailsQueryVariable.value },
     { notifyOnNetworkStatusChange: true, fetchPolicy: 'network-only', enabled: !subscriptionEnabled.value }
 )
@@ -193,13 +197,20 @@ onBlockDetailsLoaded(({ data }) => {
         emit('setBlockNumber', blockDetailsData.value.summary.number.toString())
         emit('isMined', true)
         emitErrorState(false)
+    }
+})
+
+onBlockDetailsError(error => {
+    const newError = JSON.stringify(error.message)
+    if (newError.toLowerCase().includes(excpBlockNotMined) && !subscriptionEnabled.value && !props.isHash) {
+        subscriptionEnabled.value = true
     } else {
-        emit('setBlockNumber', '')
+        emitErrorState(true)
     }
 })
 
 const blockDetailsData = computed<BlockDetailsType>(() => {
-    return blockDetailsResult?.value?.getBlockByNumber
+    return props.isHash ? blockDetailsResult?.value?.getBlockByHash : blockDetailsResult?.value?.getBlockByNumber
 })
 
 const { onResult: onNewBlockLoaded } = useNewBlockFeedSubscription(() => ({
@@ -213,16 +224,7 @@ onNewBlockLoaded(data => {
     }
 })
 
-onBlockDetailsError(error => {
-    const newError = JSON.stringify(error.message)
-    if (newError.toLowerCase().includes(excpBlockNotMined) && !subscriptionEnabled.value && !props.isHash) {
-        subscriptionEnabled.value = true
-    } else {
-        emitErrorState(true)
-    }
-})
-
-const isLoading = computed<boolean | undefined>(() => {
+const isLoading = computed<boolean>(() => {
     return state.hasError ? state.hasError : loadingBlockDetails.value || subscriptionEnabled.value
 })
 
@@ -257,7 +259,7 @@ const lastBlock = computed<number | undefined>(() => {
     return undefined
 })
 
-const nextBlock = computed<string | null>(() => {
+const nextBlock = computed<string>(() => {
     const next = blockDetailsData.value ? blockDetailsData.value.summary.number + 1 : -1
     if (lastBlock.value && lastBlock.value >= next) {
         return `/block/number/${next}`
@@ -287,14 +289,10 @@ const emitErrorState = (val: boolean, hashNotFound = false): void => {
     emit('errorDetails', state.hasError, ErrorMessageBlock.details)
 }
 
-onMounted(() => {
-    refetchBlockDetails()
-})
-
 watch(
     () => props.blockRef,
     data => {
-        refetchBlockDetails({ blockRef: parseInt(data) })
+        refetchBlockDetails()
     }
 )
 </script>

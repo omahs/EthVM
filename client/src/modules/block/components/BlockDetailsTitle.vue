@@ -69,11 +69,6 @@ const emit = defineEmits(['reload'])
 Computed Values
 ===================================================================================
 */
-
-const title = computed<string>(() => {
-    return 'Block Details'
-})
-
 const blockNumber = computed<string>(() => {
     return formatNumber(props.currBlock)
 })
@@ -86,7 +81,7 @@ Methods
 /**
  * Emit's reload to parent
  */
-const reload = () => {
+const reload = (): void => {
     emit('reload')
 }
 </script>

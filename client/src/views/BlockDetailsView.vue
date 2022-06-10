@@ -18,7 +18,7 @@
         <block-txs
             v-if="showBlockTxs"
             :max-items="10"
-            :block-ref="blockRef"
+            :block-ref="state.blockNumber"
             :is-hash="isHash"
             :is-mined="state.isMined"
             page-type="blockDetails"
@@ -66,9 +66,6 @@ const showBlockTxs = computed<boolean>(() => {
 
 onMounted(() => {
     window.scrollTo(0, 0)
-    if (!isHash.value) {
-        state.blockNumber = props.blockRef.toString()
-    }
 })
 
 /**

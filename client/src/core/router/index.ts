@@ -23,6 +23,12 @@ const routes: Array<RouteRecordRaw> = [
         props: true
     },
     {
+        path: ROUTE_NAME.BLOCK_HASH.PATH,
+        name: ROUTE_NAME.BLOCK_HASH.NAME,
+        component: BlockDetailsView,
+        props: true
+    },
+    {
         path: ROUTE_NAME.TXS.PATH,
         name: ROUTE_NAME.TXS.NAME,
         component: TxsView
