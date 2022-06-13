@@ -8,7 +8,8 @@ module.exports = {
     rules: {
         'vue/no-unused-vars': 'error',
         'vue/require-default-prop': 'off',
-        'vue/custom-event-name-casing': 'off'
+        'vue/custom-event-name-casing': 'off',
+        'linebreak-style': 'off'
         // 'graphql/template-strings': [
         //     'error',
         //     {

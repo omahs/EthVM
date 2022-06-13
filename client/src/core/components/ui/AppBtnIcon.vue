@@ -42,7 +42,7 @@ const iconColor = computed<string>(() => {
     return props.color === '' ? 'primary--text' : `${props.color}--text`
 })
 
-const btnClick = () => {
+const btnClick = (): void => {
     emit('click')
 }
 </script>

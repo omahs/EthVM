@@ -16,7 +16,7 @@ import { TitleStatus } from '@/modules/txs/models/ErrorMessagesForTx'
 const props = defineProps({
     status: {
         type: String,
-        default: 'Success'
+        default: TitleStatus.success
     }
 })
 
