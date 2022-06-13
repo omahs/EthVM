@@ -180,6 +180,7 @@ const subscriptionEnabled = ref(false)
 const blockDetailsQueryVariable = computed<string | number>(() => {
     return props.isHash ? props.blockRef : parseInt(props.blockRef)
 })
+
 const {
     result: blockDetailsResult,
     onResult: onBlockDetailsLoaded,
@@ -187,8 +188,10 @@ const {
     loading: loadingBlockDetails,
     refetch: refetchBlockDetails
 } = useQuery(
-    props.isHash ? GetBlockByHashDocument : GetBlockByNumberDocument,
-    { blockRef: blockDetailsQueryVariable.value },
+    () => (props.isHash ? GetBlockByHashDocument : GetBlockByNumberDocument),
+    () => ({
+        blockRef: blockDetailsQueryVariable.value
+    }),
     { notifyOnNetworkStatusChange: true, fetchPolicy: 'network-only', enabled: !subscriptionEnabled.value }
 )
 
@@ -288,11 +291,4 @@ const emitErrorState = (val: boolean, hashNotFound = false): void => {
     state.hasError = val
     emit('errorDetails', state.hasError, ErrorMessageBlock.details)
 }
-
-watch(
-    () => props.blockRef,
-    data => {
-        refetchBlockDetails()
-    }
-)
 </script>

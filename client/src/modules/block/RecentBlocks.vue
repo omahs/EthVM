@@ -130,9 +130,9 @@ const {
     refetch: refetchBlockArray,
     fetchMore
 } = useGetBlocksArrayByNumberQuery(
-    {
+    () => ({
         limit: props.maxItems
-    },
+    }),
     { notifyOnNetworkStatusChange: true }
 )
 

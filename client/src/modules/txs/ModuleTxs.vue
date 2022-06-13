@@ -166,9 +166,9 @@ const {
     result: getAllBlockTransfersResult,
     refetch: refetchBlockTransfers
 } = useGetBlockTransfersQuery(
-    {
+    () => ({
         _number: props.blockRef ? parseInt(props.blockRef) : undefined
-    },
+    }),
     {
         notifyOnNetworkStatusChange: true,
         enabled: props.isMined && isBlock.value
@@ -240,15 +240,6 @@ onMounted(() => {
     state.hasError = false
     refetchBlockTransfers()
 })
-
-watch(
-    () => props.blockRef,
-    data => {
-        state.initialLoad = true
-        state.hasError = false
-        refetchBlockTransfers({ _number: parseInt(props.blockRef) })
-    }
-)
 </script>
 <style scoped lang="css">
 .tx-filter-select-container {
