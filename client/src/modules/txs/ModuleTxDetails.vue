@@ -210,7 +210,7 @@ const {
     onError: onTransactionHashError,
     loading: loadingTransactionHash,
     refetch: refetchTransactionHash
-} = useGetTransactionByHashQuery({ hash: props.txRef }, { notifyOnNetworkStatusChange: true, fetchPolicy: 'network-only' })
+} = useGetTransactionByHashQuery(() => ({ hash: props.txRef }), { notifyOnNetworkStatusChange: true, fetchPolicy: 'network-only' })
 
 onTransactionHashLoaded(({ data }) => {
     if (data && data.getTransactionByHash) {
@@ -247,12 +247,12 @@ const { onResult: onNewTransactionEvent, onError: onNewTransactionEventError } =
     }
 )
 
-onNewTransactionEvent(({ data }) => {
+onNewTransactionEvent(() => {
     refetchTransactionHash()
     subscriptionEnabled.value = false
 })
 
-onNewTransactionEventError(error => {
+onNewTransactionEventError(() => {
     emitErrorState(true)
 })
 

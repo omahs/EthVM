@@ -34,9 +34,6 @@ const emit = defineEmits(['click'])
     Computed
 ===================================================================================
 */
-const size = computed<string>(() => {
-    return props.isSmall ? '20px' : '48px'
-})
 
 const iconColor = computed<string>(() => {
     return props.color === '' ? 'primary--text' : `${props.color}--text`

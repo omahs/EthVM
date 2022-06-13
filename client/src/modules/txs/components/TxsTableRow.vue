@@ -151,7 +151,18 @@ const txStatusClass = computed<string>(() => {
     return transferObj.value.status ? 'tx-status-sucess table-row-mobile' : 'tx-status-fail table-row-mobile'
 })
 
-const transferObj = computed<any>(() => {
+interface TransfarObj {
+    __typename?: 'Transfer'
+    transactionHash: string
+    to: string
+    block: number
+    timestamp: number
+    from: string
+    txFee: string
+    status?: boolean | null
+}
+
+const transferObj = computed<TransfarObj>(() => {
     return props.tx ? props.tx.transfer : { transactionHash: '', block: 0, from: '', to: '', timestamp: 0, txFee: '', status: false, __typename: 'Transfer' }
 })
 
