@@ -55,7 +55,7 @@
 
 <script setup lang="ts">
 import TableBlocksRow from '@/modules/block/components/RecentBlocks/BlocksTableRow.vue'
-import AppTableRowLoading from '@/core/components/AppTableRowLoading.vue'
+import AppTableRowLoading from '@core/components/AppTableRowLoading.vue'
 import { useDisplay } from 'vuetify/lib/framework.mjs'
 import { computed } from 'vue'
 const SCROLLVIEW = 'max-height: 450px'

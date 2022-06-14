@@ -6,7 +6,7 @@
             </v-btn>
             <v-spacer />
             <v-col cols="4">
-                <module-search />
+                <!-- <module-search /> -->
                 <!-- <app-search /> -->
             </v-col>
         </v-row>

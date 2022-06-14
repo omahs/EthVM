@@ -16,7 +16,8 @@ module.exports = {
         'generator-star-spacing': 'off',
         semi: 'off',
         'prefer-const': 'error',
-        'no-var': 'error'
+        'no-var': 'error',
+        'linebreak-style': 'off'
     },
     parserOptions: {
         ecmaVersion: 2020

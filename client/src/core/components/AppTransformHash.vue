@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 
 const props = defineProps({
     hash: String,
@@ -28,13 +28,13 @@ const props = defineProps({
 })
 
 const start = computed<string>(() => {
-    const n = props.hash.length
-    return props.hash.slice(0, n - 4)
+    const n = props.hash?.length
+    return props.hash?.slice(0, n - 4)
 })
 
 const end = computed<string>(() => {
-    const n = props.hash.length
-    return props.hash.slice(n - 4, n)
+    const n = props.hash?.length
+    return props.hash?.slice(n - 4, n)
 })
 
 const hasLink = computed<boolean>(() => {
@@ -69,7 +69,9 @@ $endWidth: 1em * $fontFaceScaleFactor * $endFixedChars;
 }
 .hash-container {
     white-space: nowrap;
-    /* overflow: hidden; */
+    overflow: hidden;
+    width: 100%;
     line-height: 1rem;
+    padding-top: 5px;
 }
 </style>
