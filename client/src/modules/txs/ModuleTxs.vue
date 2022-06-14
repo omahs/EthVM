@@ -102,12 +102,8 @@ const loading = computed<boolean>(() => {
     if (state.hasError) {
         return true
     }
-    if (isHome.value) {
-        return state.initialLoad
-    }
-
-    if (isBlock.value) {
-        return loadingBlockTxs.value
+    if (isHome.value || isBlock.value) {
+        return state.initialLoad || loadingBlockTxs.value
     }
     return loadingTxs.value
 })
@@ -164,6 +160,7 @@ const {
 const {
     loading: loadingBlockTxs,
     result: getAllBlockTransfersResult,
+    onResult: onBlockTransfersArrayLoaded,
     refetch: refetchBlockTransfers
 } = useGetBlockTransfersQuery(
     () => ({
@@ -174,6 +171,10 @@ const {
         enabled: props.isMined && isBlock.value
     }
 )
+
+onBlockTransfersArrayLoaded(() => {
+    state.initialLoad = false
+})
 
 const { onResult: onNewTransferLoaded } = useNewTransfersCompleteFeedSubscription()
 

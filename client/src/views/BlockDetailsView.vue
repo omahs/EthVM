@@ -102,4 +102,11 @@ const setError = (hasError: boolean, message: ErrorMessageBlock): void => {
         }
     }
 }
+
+watch(
+    () => props.blockRef,
+    () => {
+        state.blockNumber = props.blockRef
+    }
+)
 </script>
