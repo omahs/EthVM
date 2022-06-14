@@ -23,6 +23,31 @@ export type TxSummaryFragment = {
     } | null>
 }
 
+export type GetBlockTransfersQueryVariables = Types.Exact<{
+    _number?: Types.InputMaybe<Types.Scalars['Int']>
+}>
+
+export type GetBlockTransfersQuery = {
+    __typename?: 'Query'
+    getBlockTransfers: {
+        __typename?: 'ETHTransfers'
+        transfers: Array<{
+            __typename?: 'EthTransfer'
+            value: string
+            transfer: {
+                __typename?: 'Transfer'
+                transactionHash: string
+                to: string
+                block: number
+                timestamp: number
+                from: string
+                txFee: string
+                status?: boolean | null
+            }
+        } | null>
+    }
+}
+
 export type GetAllTxsQueryVariables = Types.Exact<{
     _limit?: Types.InputMaybe<Types.Scalars['Int']>
     _nextKey?: Types.InputMaybe<Types.Scalars['String']>
@@ -73,6 +98,55 @@ export const TxSummaryFragmentDoc = gql`
         }
     }
 `
+export const GetBlockTransfersDocument = gql`
+    query getBlockTransfers($_number: Int) {
+        getBlockTransfers(number: $_number) {
+            ...TxSummary
+        }
+    }
+    ${TxSummaryFragmentDoc}
+`
+
+/**
+ * __useGetBlockTransfersQuery__
+ *
+ * To run a query within a Vue component, call `useGetBlockTransfersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBlockTransfersQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useGetBlockTransfersQuery({
+ *   _number: // value for '_number'
+ * });
+ */
+export function useGetBlockTransfersQuery(
+    variables:
+        | GetBlockTransfersQueryVariables
+        | VueCompositionApi.Ref<GetBlockTransfersQueryVariables>
+        | ReactiveFunction<GetBlockTransfersQueryVariables> = {},
+    options:
+        | VueApolloComposable.UseQueryOptions<GetBlockTransfersQuery, GetBlockTransfersQueryVariables>
+        | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetBlockTransfersQuery, GetBlockTransfersQueryVariables>>
+        | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetBlockTransfersQuery, GetBlockTransfersQueryVariables>> = {}
+) {
+    return VueApolloComposable.useQuery<GetBlockTransfersQuery, GetBlockTransfersQueryVariables>(GetBlockTransfersDocument, variables, options)
+}
+export function useGetBlockTransfersLazyQuery(
+    variables:
+        | GetBlockTransfersQueryVariables
+        | VueCompositionApi.Ref<GetBlockTransfersQueryVariables>
+        | ReactiveFunction<GetBlockTransfersQueryVariables> = {},
+    options:
+        | VueApolloComposable.UseQueryOptions<GetBlockTransfersQuery, GetBlockTransfersQueryVariables>
+        | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetBlockTransfersQuery, GetBlockTransfersQueryVariables>>
+        | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetBlockTransfersQuery, GetBlockTransfersQueryVariables>> = {}
+) {
+    return VueApolloComposable.useLazyQuery<GetBlockTransfersQuery, GetBlockTransfersQueryVariables>(GetBlockTransfersDocument, variables, options)
+}
+export type GetBlockTransfersQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GetBlockTransfersQuery, GetBlockTransfersQueryVariables>
 export const GetAllTxsDocument = gql`
     query getAllTxs($_limit: Int, $_nextKey: String) {
         getAllEthTransfers(limit: $_limit, nextKey: $_nextKey) {
