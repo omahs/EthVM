@@ -1,4 +1,4 @@
-export const timeAgo = (date: string) => {
+export const timeAgo = (date: string | Date) => {
     const prevDate = new Date(date)
 
     const seconds = Math.floor((new Date().getTime() - prevDate.getTime()) / 1000)
