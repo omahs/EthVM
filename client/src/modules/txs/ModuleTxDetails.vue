@@ -86,7 +86,7 @@ const txFee = computed<FormattedNumber>(() => {
         const fee = price.times(used)
         return formatVariableUnitEthValue(fee)
     }
-    if (!isReplaced.value && txStatus.value === TxStatus.Pending) {
+    if (!isReplaced.value && txStatus.value === TxStatus.pending) {
         const fee = new BN(transactionData.value?.gas).multipliedBy(transactionData.value?.gasPrice)
         return formatVariableUnitEthValue(fee)
     }
@@ -94,7 +94,7 @@ const txFee = computed<FormattedNumber>(() => {
 })
 
 const pendingString = computed<string>(() => {
-    return !isReplaced.value && txStatus.value === TxStatus.Pending ? 'Estimated Fee' : 'Tx Fee'
+    return !isReplaced.value && txStatus.value === TxStatus.pending ? 'Estimated Fee' : 'Tx Fee'
 })
 
 const txDetails = computed<Detail[]>(() => {
@@ -162,7 +162,7 @@ const txDetails = computed<Detail[]>(() => {
             // txInput: this.inputFormatted
         }
     ]
-    if (txStatus.value !== TxStatus.Pending && !isReplaced.value) {
+    if (txStatus.value !== TxStatus.pending && !isReplaced.value) {
         const time = {
             title: 'Timestamp',
             detail: transactionData.value?.timestamp !== null ? new Date(transactionData.value?.timestamp * 1e3).toString() : ''
@@ -170,7 +170,7 @@ const txDetails = computed<Detail[]>(() => {
         details.splice(1, 0, time)
     }
 
-    if (txStatus.value !== TxStatus.Pending && !isReplaced.value) {
+    if (txStatus.value !== TxStatus.pending && !isReplaced.value) {
         const block = {
             title: 'Block #',
             detail: formatNumber(transactionData.value?.blockNumber || 0),
