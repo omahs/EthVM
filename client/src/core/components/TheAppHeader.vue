@@ -1,15 +1,12 @@
 <template>
-    <v-app-bar color="white">
-        <v-row>
-            <v-btn v-if="md || sm || xs" icon color="primary" @click.stop="$emit('openDrawer')">
-                <v-icon>mdi-menu</v-icon>
-            </v-btn>
-            <v-spacer />
-            <v-col cols="4">
-                <!-- <module-search /> -->
-                <!-- <app-search /> -->
-            </v-col>
-        </v-row>
+    <v-app-bar color="white" extended>
+        <v-btn v-if="md || sm || xs" icon color="primary" @click.stop="$emit('openDrawer')">
+            <v-icon>mdi-menu</v-icon>
+        </v-btn>
+        <v-spacer />
+        <v-toolbar-items> <module-search class="mb-n3 mt-5" /> </v-toolbar-items>
+
+        <!-- <app-search /> -->
     </v-app-bar>
 </template>
 

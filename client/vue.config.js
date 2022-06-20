@@ -44,7 +44,8 @@ module.exports = defineConfig({
                 '@': path.resolve(__dirname, 'src/'),
                 '@module': path.resolve(__dirname, 'src/modules/'),
                 '@view': path.resolve(__dirname, 'src/views/'),
-                '@core': path.resolve(__dirname, 'src/core/')
+                '@core': path.resolve(__dirname, 'src/core/'),
+                '@apollo-types': path.resolve(__dirname, 'src/apollo/types/')
             }
         }
     },
