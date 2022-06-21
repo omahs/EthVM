@@ -1,12 +1,10 @@
 <template>
-    <v-app-bar color="white" extended>
+    <v-app-bar color="white">
         <v-btn v-if="md || sm || xs" icon color="primary" @click.stop="$emit('openDrawer')">
             <v-icon>mdi-menu</v-icon>
         </v-btn>
         <v-spacer />
-        <v-toolbar-items> <module-search class="mb-n3 mt-5" /> </v-toolbar-items>
-
-        <!-- <app-search /> -->
+        <v-toolbar-items> <module-search class="mb-n2 mt-8" /> </v-toolbar-items>
     </v-app-bar>
 </template>
 

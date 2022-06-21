@@ -1,39 +1,46 @@
 <template>
     <v-row align-content="end" justify="end" no-gutters>
-        <v-col cols="4">
-            <v-select v-model="select" :items="props.selectItems" @change="onSearch" />
+        <v-col cols="4" lg="3">
+            <v-select v-model="selected" :items="props.selectItems" @update:modelValue="onSearch" variant="outlined" />
         </v-col>
         <v-col>
-            <!-- <v-text-field
-            v-model="message2"
-            label="Contained"
-            variant="contained"
-            clearable
-            clear-icon="mdi-delete"
-          ></v-text-field> -->
             <v-text-field
+                id="search-options-activator"
                 v-model="search.value"
                 label="Search Address, Tx, Block"
                 clearable
                 dense
+                :color="props.hasError ? 'red' : 'black'"
+                variant="outlined"
                 :error-messages="errorMes"
                 :loading="props.isLoading"
                 @click:clear="resetValues"
                 @update:modelValue="onSearch"
-            ></v-text-field>
-            <!-- <v-combobox
-                v-model=""
-                :loading="isLoading"
-                :items="props.items"
-                label=""
-                item-value="contract"
-                item-text="keyword"
-                :error="true"
-                hide-no-data
-                clearable
+                @focus="search.focus = true"
+                @blur="search.focus = false"
                 @keyup.enter="onSearch"
-                @click:clear="search.value = ''"
-            ></v-combobox> -->
+            ></v-text-field>
+            <!-- TEMP COMPONENET: replace with combobox  -->
+            <v-menu location="bottom" activator="#search-options-activator">
+                <v-card v-if="searchOptions.length > 0" min-width="400" max-height="300px">
+                    <v-list>
+                        <v-list-subheader>Tokens</v-list-subheader>
+                        <v-list-item
+                            v-for="item in searchOptions"
+                            :key="item.contract"
+                            prepend-icon="mdi-alpha-t-circle"
+                            :title="item.text"
+                            :subtitle="item.contract"
+                            class="overflow-hidden"
+                            @click="onSelectToken(item.contract)"
+                        >
+                            <!-- <template v-slot:append>
+                                <v-list-item-subtitle end> $12.99 </v-list-item-subtitle>
+                            </template> -->
+                        </v-list-item>
+                    </v-list>
+                </v-card>
+            </v-menu>
         </v-col>
     </v-row>
 </template>
@@ -42,7 +49,7 @@
 import type { Ref } from 'vue'
 import { PropType } from 'vue'
 import { defineProps, defineEmits, reactive, computed, ref, watch } from 'vue'
-
+import { SearchTokenOption } from './props/index'
 const props = defineProps({
     selectItems: {
         type: Array as PropType<string[]>,
@@ -54,28 +61,19 @@ const props = defineProps({
     },
     hasError: {
         type: Boolean
+    },
+    searchOptions: {
+        type: Array as PropType<SearchTokenOption[]>,
+        default: () => []
     }
 })
 
 const emit = defineEmits<{
     (e: 'onSearch', searchValue: string, filterValue: string | undefined): void
-    // (e: 'onSearchWithFilter', searchValue: string, filterValue): void
-    // (e: 'routeTo', page: string, value: string): void
+    (e: 'tokenSelected', contract: string): void
 }>()
-/*
-  ===================================================================================
-    Props
-  ===================================================================================
-  */
-/*
-  ===================================================================================
-    Select
-  ===================================================================================
-  */
 
-// const selectTypes = ['all', 'token-detail']
-
-const select = ref(props.selectItems[0])
+const selected = ref(props.selectItems[0])
 
 /*
   ===================================================================================
@@ -83,29 +81,28 @@ const select = ref(props.selectItems[0])
   ===================================================================================
   */
 interface Search {
-    autocomplete: string
+    focus: boolean
     timeout: number
     value: string
+    optionsTimeout: number
 }
 
-const search: Search = reactive({ autocomplete: '', timeout: 0, value: '' })
-
-// watch(
-//     () => search.autocomplete,
-//     newVal => {
-//         onSearch()
-//         console.log(select.value)
-//     }
-// )
-
+const search: Search = reactive({ focus: false, timeout: 0, value: '', optionsTimeout: 0 })
 /**
- * Emits received value to parent
- * @param param {Any}
+ * Emits user input to parent with the timeout of 600
  */
 const onSearch = (): void => {
+    clearTimeout(search.timeout)
     search.timeout = window.setTimeout(() => {
-        emit('onSearch', search.value, select.value)
-    }, 500)
+        emit('onSearch', search.value, selected.value)
+    }, 600)
+}
+/**
+ * Emits selected token contract from the parent provided options
+ * @param {string} contract - token contract to emit
+ */
+const onSelectToken = (contract: string): void => {
+    emit('tokenSelected', contract)
 }
 
 /**
@@ -113,22 +110,20 @@ const onSearch = (): void => {
  */
 const resetValues = (): void => {
     clearTimeout(search.timeout)
-    emit('onSearch', search.value, select.value)
+    emit('onSearch', search.value, selected.value)
 }
-
-/*
-  ===================================================================================
-    Computed Values
-  ===================================================================================
-  */
-const getIcon = computed<string>(() => {
-    return ''
-    // return !props.hasError ? 'fa fa-search grey--text text--lighten-1 pr-4 pl-4' : 'fa fa-search error--text pr-4 pl-4'
-})
 
 /* TEMP SOLUTIONS: SINCE VUETIFY ERROR STATE IS BROKEN */
 const errorMes = computed<string>(() => {
     return props.hasError ? 'ERROR: INVALID SEARCH' : ''
 })
 </script>
-<style lang="scss"></style>
+<style lang="scss">
+.search-options {
+    position: fixed;
+    position: absolute;
+    top: 100px;
+    background-color: green;
+    z-index: 1000;
+}
+</style>

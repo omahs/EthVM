@@ -46,6 +46,12 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: ROUTE_NAME.TOKENS.PATH,
         name: ROUTE_NAME.TOKENS.NAME,
+        component: ViewTemp,
+        props: true
+    },
+    {
+        path: ROUTE_NAME.TOKEN.PATH,
+        name: ROUTE_NAME.TOKEN.NAME,
         component: ViewTemp
     },
     {
