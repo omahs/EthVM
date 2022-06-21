@@ -34,12 +34,12 @@ import AppNewUpdate from '@core/components/ui/AppNewUpdate.vue'
 import AppPaginateHasMore from '@core/components/ui/AppPaginateHasMore.vue'
 import AppPaginate from '@core/components/ui/AppPaginate.vue'
 import { useGetAllTxsQuery, useNewTransfersCompleteFeedSubscription, useGetBlockTransfersQuery } from './apollo/transfersQuery.generated'
-import { computed, onMounted, reactive, watch } from 'vue'
+import { computed, onMounted, reactive } from 'vue'
 import { useResult } from '@vue/apollo-composable'
 import TxsTable from '@module/txs/components/TxsTable.vue'
 import BN from 'bignumber.js'
 
-interface Reactive {
+interface ModuleState {
     initialLoad: boolean
     index: number
     isEnd: number
@@ -47,7 +47,7 @@ interface Reactive {
     hasError: boolean
 }
 
-const state: Reactive = reactive({
+const state: ModuleState = reactive({
     initialLoad: true,
     index: 0,
     isEnd: 0,
@@ -181,7 +181,7 @@ const { onResult: onNewTransferLoaded } = useNewTransfersCompleteFeedSubscriptio
 const allEthTransfers = useResult(getAllEthTransfers, null, data => data.getAllEthTransfers)
 const allBlockTransfersResult = useResult(getAllBlockTransfersResult, null, data => data.getBlockTransfers)
 
-onTxsArrayLoaded(result => {
+onTxsArrayLoaded(() => {
     state.initialLoad = false
 })
 

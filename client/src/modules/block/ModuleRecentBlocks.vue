@@ -45,7 +45,7 @@ interface BlockMap {
     [key: number]: TypeBlocks
 }
 
-interface Reactive {
+interface ComponentState {
     initialLoad: boolean
     hasError: boolean
     indexedBlocks: BlockMap
@@ -54,7 +54,7 @@ interface Reactive {
     startBlock: number
 }
 
-const state: Reactive = reactive({
+const state: ComponentState = reactive({
     initialLoad: true,
     hasError: false,
     indexedBlocks: {},

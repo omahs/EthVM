@@ -1,10 +1,12 @@
-import { createRouter, createWebHashHistory, createWebHistory, RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import { ROUTE_NAME } from './routesNames'
 import HomeView from '@view/HomeView.vue'
 import BlocksView from '@view/BlocksView.vue'
+import TxDetailsView from '@/views/TxDetailsView.vue'
 import BlockDetailsView from '@view/BlockDetailsView.vue'
 import TxsView from '@view/TxsView.vue'
 import ViewTemp from '@view/ViewTemp.vue'
+
 const routes: Array<RouteRecordRaw> = [
     {
         path: ROUTE_NAME.HOME.PATH,
@@ -36,7 +38,8 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: ROUTE_NAME.TX_HASH.PATH,
         name: ROUTE_NAME.TX_HASH.NAME,
-        component: ViewTemp
+        component: TxDetailsView,
+        props: true
     },
     {
         path: ROUTE_NAME.TXS_PENDING.PATH,

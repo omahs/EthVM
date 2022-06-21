@@ -73,7 +73,6 @@ const convertToTrillions = (value: BigNumber): FormattedNumber => {
 }
 
 const convertToQuadrillion = (value: BigNumber): FormattedNumber => {
-    const result = value.dividedBy(OneQuadrillion)
     return { value: '> 1Q', unit: FormattedNumberUnit.Q, tooltipText: value.toFormat() }
 }
 
@@ -317,7 +316,6 @@ export const formatNonVariableEthValue = (value: BigNumber): FormattedNumber => 
  */
 export const formatNonVariableGWeiValue = (value: BigNumber): FormattedNumber => {
     const gweiBN = new EthValue(value).toGweiBN()
-    const dps = gweiBN.decimalPlaces()
     const unit = FormattedNumberUnit.GWEI
 
     /**

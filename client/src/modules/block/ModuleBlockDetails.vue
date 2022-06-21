@@ -24,17 +24,15 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, computed, ref, onMounted, watch } from 'vue'
+import { reactive, computed, ref } from 'vue'
 import BN from 'bignumber.js'
 import AppDetailsList from '@/core/components/ui/AppDetailsList.vue'
 import BlockDetailsTitle from '@module/block/components/BlockDetailsTitle.vue'
-import { eth } from '@/core/helper'
 import { Detail } from '@/core/components/props'
 import {
     BlockDetailsFragment as BlockDetailsType,
     GetBlockByHashDocument,
     GetBlockByNumberDocument,
-    useGetBlockByNumberQuery,
     useGetLastBlockNumberQuery
 } from '@/modules/block/apollo/BlockDetails/blockDetails.generated'
 import { ErrorMessageBlock } from '@/modules/block/models/ErrorMessagesForBlock'
@@ -195,7 +193,7 @@ const {
     { notifyOnNetworkStatusChange: true, fetchPolicy: 'network-only', enabled: !subscriptionEnabled.value }
 )
 
-onBlockDetailsLoaded(({ data }) => {
+onBlockDetailsLoaded(() => {
     if (blockDetailsData.value) {
         emit('setBlockNumber', blockDetailsData.value.summary.number.toString())
         emit('isMined', true)
@@ -287,7 +285,7 @@ const currBlockNumber = computed<number | null>(() => {
  * @param val {Boolean}
  * @param hashNotFound {Boolean}
  */
-const emitErrorState = (val: boolean, hashNotFound = false): void => {
+const emitErrorState = (val: boolean): void => {
     state.hasError = val
     emit('errorDetails', state.hasError, ErrorMessageBlock.details)
 }

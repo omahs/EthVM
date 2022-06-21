@@ -23,6 +23,17 @@ export type TxSummaryFragment = {
     } | null>
 }
 
+export type SummaryFragment = {
+    __typename?: 'Transfer'
+    transactionHash: string
+    to: string
+    block: number
+    timestamp: number
+    from: string
+    txFee: string
+    status?: boolean | null
+}
+
 export type GetBlockTransfersQueryVariables = Types.Exact<{
     _number?: Types.InputMaybe<Types.Scalars['Int']>
 }>
@@ -82,21 +93,27 @@ export type NewTransfersCompleteFeedSubscription = {
     newTransfersCompleteFeed: { __typename?: 'TransferComplete'; block: number; type: Types.TransferType }
 }
 
+export const SummaryFragmentDoc = gql`
+    fragment Summary on Transfer {
+        transactionHash
+        to
+        block
+        timestamp
+        from
+        txFee
+        status
+    }
+`
 export const TxSummaryFragmentDoc = gql`
     fragment TxSummary on ETHTransfers {
         transfers {
             transfer {
-                transactionHash
-                to
-                block
-                timestamp
-                from
-                txFee
-                status
+                ...Summary
             }
             value
         }
     }
+    ${SummaryFragmentDoc}
 `
 export const GetBlockTransfersDocument = gql`
     query getBlockTransfers($_number: Int) {
