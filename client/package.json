@@ -5,7 +5,9 @@
     "main": "index.js",
     "private": true,
     "scripts": {
+        "ts-serve": "run-p type-check serve",
         "serve": "vue-cli-service serve",
+        "type-check": "vue-tsc --noEmit --watch",
         "build": "vue-cli-service build",
         "lint": "vue-cli-service lint",
         "codegen-generate": "graphql-codegen --config codegen.yml"
@@ -16,6 +18,7 @@
         "@graphql-codegen/near-operation-file-preset": "^2.2.9",
         "@graphql-codegen/typescript-vue-apollo": "^3.2.9",
         "@mdi/font": "5.9.55",
+        "@types/webpack-env": "^1.17.0",
         "@vue/apollo-composable": "^4.0.0-alpha.12",
         "assert": "^2.0.0",
         "bignumber.js": "^9.0.2",
@@ -53,6 +56,7 @@
         "eslint-config-prettier": "^8.3.0",
         "eslint-plugin-prettier": "^4.0.0",
         "eslint-plugin-vue": "^8.0.3",
+        "npm-run-all": "^4.1.5",
         "prettier": "^2.4.1",
         "process": "^0.11.10",
         "sass": "^1.38.0",
@@ -62,6 +66,7 @@
         "subscriptions-transport-ws": "^0.11.0",
         "typescript": "~4.5.5",
         "vue-cli-plugin-vuetify": "~2.4.8",
+        "vue-tsc": "^0.37.9",
         "vuetify-loader": "^2.0.0-alpha.0"
     },
     "peerDependencies": {

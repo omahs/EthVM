@@ -182,17 +182,23 @@ const disableNext = computed<boolean>(() => {
  * WATCHER
  * =======================================================
  */
-watch(props.currentPage, (newVal, oldVal) => {
-    if (newVal > state.lastPageLoad && newVal > oldVal) {
-        state.lastPageLoad = props.currentPage
+watch(
+    () => props.currentPage,
+    (newVal, oldVal) => {
+        if (newVal > state.lastPageLoad && newVal > oldVal) {
+            state.lastPageLoad = props.currentPage
+        }
     }
-})
+)
 
-watch(props.hasMore, (newVal, oldVal) => {
-    if (!newVal && oldVal) {
-        state.hasLast = true
+watch(
+    () => props.hasMore,
+    (newVal, oldVal) => {
+        if (!newVal && oldVal) {
+            state.hasLast = true
+        }
     }
-})
+)
 </script>
 
 <style scoped lang="scss">

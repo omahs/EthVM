@@ -34,6 +34,10 @@ const ROUTE_NAME: Route = {
         PATH: '/address/:addressRef',
         NAME: 'address'
     },
+    ADDRESS_TOKENS: {
+        PATH: '/address/:addressRef/tokens',
+        NAME: 'address-tokens'
+    },
     CHARTS: {
         PATH: '/charts',
         NAME: 'charts'
