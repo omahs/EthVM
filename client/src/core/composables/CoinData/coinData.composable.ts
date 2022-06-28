@@ -1,5 +1,7 @@
 import { useGetLatestPricesQuery } from './getLatestPrices.generated'
 import { computed } from 'vue'
+import { useStore } from '@/store'
+import { storeToRefs } from 'pinia'
 
 interface TokenMarketData {
     __typename?: 'TokenMarketInfo'
@@ -16,7 +18,9 @@ interface TokenMarketData {
 }
 
 export function useCoinData() {
-    const { result, loading } = useGetLatestPricesQuery({ pollInterval: 300000 })
+    const store = useStore()
+    const { coinData, loadingCoinData } = storeToRefs(store)
+    // const { result, loading } = useGetLatestPricesQuery({ pollInterval: 300000 })
     const hasData = (token: TokenMarketData | null): boolean => {
         if (token) {
             if (token.contract === null || token.current_price === null || token.market_cap === null || token.total_supply === null) {
@@ -28,16 +32,16 @@ export function useCoinData() {
     }
 
     const filteredLatestPrice = computed<any>(() => {
-        if (result.value && result.value?.getLatestPrices.length > 0) {
-            const filteredRes = result.value?.getLatestPrices.filter(token => hasData(token) && token?.id !== 'ethereum')
+        if (coinData.value && coinData.value?.getLatestPrices.length > 0) {
+            const filteredRes = coinData.value?.getLatestPrices.filter(token => hasData(token) && token?.id !== 'ethereum')
             return filteredRes || []
         }
         return []
     })
 
     const ethereumTokens = computed<any>(() => {
-        if (result.value && result.value?.getLatestPrices.length > 0) {
-            const filteredRes = result.value?.getLatestPrices.filter(token => token?.id !== 'ethereum')
+        if (coinData.value && coinData.value?.getLatestPrices.length > 0) {
+            const filteredRes = coinData.value?.getLatestPrices.filter(token => token?.id !== 'ethereum')
             return filteredRes || []
         }
         return []
@@ -45,8 +49,8 @@ export function useCoinData() {
 
     const tokensMarketInfo = computed<Map<string, TokenMarketData>>(() => {
         const marketInfo = new Map()
-        if (result.value && result.value?.getLatestPrices.length > 0) {
-            result.value?.getLatestPrices.forEach(token => {
+        if (coinData.value && coinData.value?.getLatestPrices.length > 0) {
+            coinData.value?.getLatestPrices.forEach(token => {
                 if (token?.id !== 'ethereum' && hasData(token)) {
                     marketInfo.set(token?.contract?.toLowerCase(), token)
                 }
@@ -61,7 +65,7 @@ export function useCoinData() {
      * @returns {Map} TokenMarketData or {Boolean}
      */
     const getEthereumTokenByContract = (contract: string): TokenMarketData | false => {
-        if (!loading.value) {
+        if (!loadingCoinData.value) {
             const token = tokensMarketInfo.value.get(contract.toLowerCase())
             if (token) {
                 return token

@@ -2,20 +2,23 @@
     <v-app>
         <the-app-navigation-drawer />
         <v-main>
-            <router-view :tokens="ethereumTokens" />
+            <router-view />
         </v-main>
     </v-app>
 </template>
 
 <script setup lang="ts">
-import { useCoinData } from '@core/composables/CoinData/coinData.composable'
 import TheAppNavigationDrawer from '@core/components/TheAppNavigationDrawer.vue'
 import { useStore } from '@/store'
-
+import { useGetLatestPricesQuery } from '@core/composables/CoinData/getLatestPrices.generated'
 const store = useStore()
 
-const { ethereumTokens } = useCoinData()
-store.tokenPrices = ethereumTokens
+const { result: coinData, loading: loadingCoinData, onResult } = useGetLatestPricesQuery({ pollInterval: 300000 })
+console.log(coinData.value)
+onResult(() => {
+    store.coinData = coinData.value
+    store.loadingCoinData = loadingCoinData.value
+})
 </script>
 
 <style lang="scss">
