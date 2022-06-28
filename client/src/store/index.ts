@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { GetLatestPricesQuery } from '@core/composables/CoinData/getLatestPrices.generated'
 
 interface StoreState {
-    coinData: GetLatestPricesQuery
+    coinData: GetLatestPricesQuery | undefined
     loadingCoinData: boolean
 }
 

@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, computed, ref } from 'vue'
+import { reactive, computed, ref, onMounted, watch } from 'vue'
 import BN from 'bignumber.js'
 import AppDetailsList from '@/core/components/ui/AppDetailsList.vue'
 import BlockDetailsTitle from '@module/block/components/BlockDetailsTitle.vue'

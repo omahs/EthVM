@@ -13,8 +13,8 @@ import { useStore } from '@/store'
 import { useGetLatestPricesQuery } from '@core/composables/CoinData/getLatestPrices.generated'
 const store = useStore()
 
+store.loadingCoinData = true
 const { result: coinData, loading: loadingCoinData, onResult } = useGetLatestPricesQuery({ pollInterval: 300000 })
-console.log(coinData.value)
 onResult(() => {
     store.coinData = coinData.value
     store.loadingCoinData = loadingCoinData.value

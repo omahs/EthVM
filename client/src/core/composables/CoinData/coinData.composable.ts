@@ -23,10 +23,7 @@ export function useCoinData() {
     // const { result, loading } = useGetLatestPricesQuery({ pollInterval: 300000 })
     const hasData = (token: TokenMarketData | null): boolean => {
         if (token) {
-            if (token.contract === null || token.current_price === null || token.market_cap === null || token.total_supply === null) {
-                return false
-            }
-            return true
+            return !(token.contract === null || token.current_price === null || token.market_cap === null || token.total_supply === null)
         }
         return true
     }
