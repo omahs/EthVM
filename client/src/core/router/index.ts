@@ -4,6 +4,7 @@ import HomeView from '@view/HomeView.vue'
 import BlocksView from '@view/BlocksView.vue'
 import TxDetailsView from '@/views/TxDetailsView.vue'
 import BlockDetailsView from '@view/BlockDetailsView.vue'
+import TokenDetailsView from '@view/TokenDetailsView.vue'
 import TxsView from '@view/TxsView.vue'
 import ViewTemp from '@view/ViewTemp.vue'
 
@@ -11,7 +12,8 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: ROUTE_NAME.HOME.PATH,
         name: ROUTE_NAME.HOME.NAME,
-        component: HomeView
+        component: HomeView,
+        props: true
     },
     {
         path: ROUTE_NAME.BLOCKS.PATH,
@@ -47,9 +49,10 @@ const routes: Array<RouteRecordRaw> = [
         component: ViewTemp
     },
     {
-        path: ROUTE_NAME.TOKENS.PATH,
-        name: ROUTE_NAME.TOKENS.NAME,
-        component: ViewTemp
+        path: ROUTE_NAME.TOKEN.PATH,
+        name: ROUTE_NAME.TOKEN.NAME,
+        component: TokenDetailsView,
+        props: true
     },
     {
         path: ROUTE_NAME.CHARTS.PATH,

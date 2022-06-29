@@ -34,7 +34,7 @@ import AppNewUpdate from '@core/components/ui/AppNewUpdate.vue'
 import AppPaginateHasMore from '@core/components/ui/AppPaginateHasMore.vue'
 import AppPaginate from '@core/components/ui/AppPaginate.vue'
 import { useGetAllTxsQuery, useNewTransfersCompleteFeedSubscription, useGetBlockTransfersQuery } from './apollo/transfersQuery.generated'
-import { computed, onMounted, reactive } from 'vue'
+import { computed, onMounted, reactive, watch } from 'vue'
 import { useResult } from '@vue/apollo-composable'
 import TxsTable from '@module/txs/components/TxsTable.vue'
 import BN from 'bignumber.js'
@@ -241,6 +241,15 @@ onMounted(() => {
     state.hasError = false
     refetchBlockTransfers()
 })
+
+watch(
+    () => props.blockRef,
+    () => {
+        state.initialLoad = true
+        state.hasError = false
+        refetchBlockTransfers({ _number: parseInt(props.blockRef) })
+    }
+)
 </script>
 <style scoped lang="css">
 .tx-filter-select-container {
