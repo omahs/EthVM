@@ -48,7 +48,7 @@ export function useCoinData() {
      * @returns {Map} TokenMarketData or {Boolean}
      */
     const getEthereumTokensMap = (contracts: string[]): Map<string, TokenMarketData> | false => {
-        if (!loading.value) {
+        if (!loadingCoinData.value) {
             const requestMarketInfo = new Map<string, TokenMarketData>()
             contracts.forEach(contract => {
                 const token = tokensMarketInfo.value.get(contract.toLowerCase())
@@ -78,5 +78,5 @@ export function useCoinData() {
         return false
     }
 
-    return { ethereumTokens, filteredLatestPrice, getEthereumTokenByContract, getEthereumTokensMap, loading }
+    return { ethereumTokens, filteredLatestPrice, getEthereumTokenByContract, getEthereumTokensMap, loading: loadingCoinData }
 }

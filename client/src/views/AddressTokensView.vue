@@ -14,14 +14,27 @@ import AppError from '@core/components/ui/AppError.vue'
 import ModuleAddressTokens from '@module/address/ModuleAddressTokens.vue'
 import ModuleAddressTokenTransfers from '@module/address/ModuleAddressTokenTransfers.vue'
 import { eth } from '@core/helper'
+import { useAddressEventSubscription } from '@module/address/apollo/addressEvent.generated'
+import { AddressEventType } from '@/apollo/types'
 
 const props = defineProps({
     addressRef: String
 })
 
 const state = {
-    error: ''
+    error: '',
+    newTransfers: 0
 }
+
+const { result: addressUpdate, onResult } = useAddressEventSubscription({
+    owner: props.addressRef
+})
+
+onResult(data => {
+    if (data?.data?.addressEvent.event === AddressEventType.NewErc20Transfer) {
+        state.newTransfers += 1
+    }
+})
 
 const isValid = computed<boolean>(() => {
     return eth.isValidAddress(props.addressRef)

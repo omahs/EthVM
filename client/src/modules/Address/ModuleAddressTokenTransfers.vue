@@ -2,9 +2,7 @@
     <v-card>
         <v-card-title class="justify-space-between">
             Token Transfer History
-            <!--            <app-paginate v-if="!loadingTokens" :total="totalPages" :current-page="state.index" @newPage="setPage" />-->
             <app-paginate-has-more
-                v-if="!loadingTransfers"
                 :class="smAndDown ? 'pt-3' : ''"
                 :has-more="hasMore"
                 :current-page="state.index"
@@ -42,34 +40,59 @@
                 </div>
             </template>
             <template v-else>
-                <v-row v-for="transfer in transfers" :key="transfer.contract" class="ma-0 text-subtitle-2 font-weight-regular" align="center">
+                <v-row
+                    v-for="(transfer, index) in transfers"
+                    :key="`${transfer.transfer.transactionHash} - ${index}`"
+                    class="ma-0 text-subtitle-2 font-weight-regular"
+                    align="center"
+                >
                     <v-col cols="2">
                         <v-row class="ma-0" align="center">
                             <div class="token-image">
                                 <img :src="getImg(transfer.contract) || require('@/assets/icon-token.png')" alt="" height="24" width="24" class="mr-2" />
                             </div>
-                            <!--                            <router-link v-if="tokenTransfer.name !== '' || tokenTransfer.symbol" :to="`/token/${transfer.contract}`" class="black&#45;&#45;text">-->
-                            <!--                                <p v-if="tokenTransfer.name">{{ tokenTransfer.name }}</p>-->
-                            <!--                                <p v-else class="text-uppercase caption">{{ tokenTransfer.symbol }}</p>-->
-                            <!--                            </router-link>-->
+                            <router-link
+                                v-if="transfer.tokenInfo.name !== '' || transfer.tokenInfo.symbol"
+                                :to="`/token/${transfer.contract}`"
+                                class="black--text"
+                            >
+                                <p v-if="transfer.tokenInfo.name">{{ transfer.tokenInfo.name }}</p>
+                                <p v-else class="text-uppercase caption">{{ transfer.tokenInfo.symbol }}</p>
+                            </router-link>
                         </v-row>
                     </v-col>
                     <v-col cols="1">
-                        <v-row class="ma-0" align="center"> Symbol </v-row>
+                        <v-row class="ma-0" align="center">{{ transfer.tokenInfo.symbol }}</v-row>
                     </v-col>
                     <v-col cols="2">
-                        <v-row class="ma-0" align="center"> Amount </v-row>
+                        <v-row class="ma-0" align="center">
+                            <p>
+                                {{ getAmount(transfer).value }}
+                                <app-tooltip v-if="getAmount(transfer).tooltipText" :text="`${getAmount(transfer).tooltipText} ${transfer.tokenInfo.symbol}`" />
+                            </p>
+                        </v-row>
                     </v-col>
                     <v-col cols="1">
-                        <v-row class="ma-0" align="center"> From/To </v-row>
+                        <v-row class="ma-0" align="center">
+                            <v-icon :class="transferType(transfer) === 'in' ? 'text-green' : 'text-red'">
+                                {{ transferType(transfer) === 'in' ? 'mdi-arrow-left' : 'mdi-arrow-right' }}
+                            </v-icon>
+                            {{ transferType(transfer) === 'in' ? 'From' : 'To' }}
+                        </v-row>
                     </v-col>
                     <v-col cols="2">
-                        <v-row class="ma-0 flex-nowrap" align="center"> Address </v-row>
+                        <v-row class="ma-0 flex-nowrap" align="center">
+                            <app-transform-hash :hash="eth.toCheckSum(transferTypeAddress(transfer))" />
+                        </v-row>
                     </v-col>
                     <v-col cols="2">
-                        <v-row class="ma-0 flex-nowrap" align="center"> Timestamp </v-row>
+                        <v-row class="ma-0 flex-nowrap" align="center">
+                            {{ timeAgo(new Date(transfer.transfer.timestamp * 1e3)) }}
+                        </v-row>
                     </v-col>
-                    <v-col cols="2">Hash</v-col>
+                    <v-col cols="2">
+                        <app-transform-hash :hash="eth.toCheckSum(transfer.transfer.transactionHash)" />
+                    </v-col>
                 </v-row>
             </template>
         </div>
@@ -79,6 +102,8 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import AppPaginateHasMore from '@core/components/ui/AppPaginateHasMore.vue'
+import AppTooltip from '@core/components/ui/AppTooltip.vue'
+import AppTransformHash from '@core/components/ui/AppTransformHash.vue'
 import { MarketDataFragment as TokenMarketData } from '@core/composables/CoinData/getLatestPrices.generated'
 import { useCoinData } from '@core/composables/CoinData/coinData.composable'
 import { TOKEN_FILTER_VALUES, TokenSort, Token } from '@module/address/models/TokenSort'
@@ -87,8 +112,10 @@ const { getEthereumTokensMap, loading: loadingEthTokens, getEthereumTokenByContr
 import BN from 'bignumber.js'
 import { useDisplay } from 'vuetify/lib/framework.mjs'
 import { TransferFragmentFragment as Transfer, useGetAddressErc20TransfersQuery } from '@module/address/apollo/transfers.generated'
+import { eth, timeAgo } from '@core/helper'
 
 const MAX_ITEMS = 10
+const TYPES = ['in', 'out', 'self']
 
 const { smAndDown } = useDisplay()
 const props = defineProps({
@@ -169,23 +196,61 @@ const getImg = (contract: string): string | undefined => {
     return undefined
 }
 
+const transferType = (transfer: Transfer): string => {
+    const from = transfer.transfer.from.toLowerCase()
+    const to = transfer.transfer.to.toLowerCase()
+    const addr = props.addressHash.toLowerCase()
+
+    if (addr === from && addr === to) {
+        return TYPES[2]
+    } else if (addr === from) {
+        return TYPES[1]
+    }
+    return TYPES[0]
+}
+
+const transferTypeAddress = (transfer: Transfer): string => {
+    switch (transferType(transfer)) {
+        case TYPES[0]:
+            return transfer.transfer.from
+        case TYPES[1]:
+            return transfer.transfer.to
+        default:
+            return props.addressHash
+    }
+}
+
+const getValue = (transfer: Transfer): BN => {
+    let n = new BN(transfer.value)
+    if (transfer.tokenInfo.decimals) {
+        n = n.div(new BN(10).pow(transfer.tokenInfo.decimals))
+    }
+    return n
+}
+
+const getAmount = (transfer: Transfer) => {
+    return formatFloatingPointValue(getValue(transfer))
+}
+
 const setPage = (page: number, reset: boolean) => {
-    state.index = page
-    fetchMore({
-        variables: {
-            hash: props.addressHash,
-            _limit: MAX_ITEMS,
-            _nextKey: result.value?.getERC20Transfers?.nextKey
-        },
-        updateQuery: (prev, { fetchMoreResult }) => {
-            return {
-                getERC20Transfers: {
-                    nextKey: fetchMoreResult?.getERC20Transfers.nextKey,
-                    transfers: [...prev.getERC20Transfers.transfers, ...(fetchMoreResult?.getERC20Transfers.transfers || [])],
-                    __typename: fetchMoreResult?.getERC20Transfers.__typename
+    if (page > state.index && hasMore.value) {
+        fetchMore({
+            variables: {
+                hash: props.addressHash,
+                _limit: MAX_ITEMS,
+                _nextKey: result.value?.getERC20Transfers?.nextKey
+            },
+            updateQuery: (prev, { fetchMoreResult }) => {
+                return {
+                    getERC20Transfers: {
+                        nextKey: fetchMoreResult?.getERC20Transfers.nextKey,
+                        transfers: [...prev.getERC20Transfers.transfers, ...(fetchMoreResult?.getERC20Transfers.transfers || [])],
+                        __typename: fetchMoreResult?.getERC20Transfers.__typename
+                    }
                 }
             }
-        }
-    })
+        })
+    }
+    state.index = page
 }
 </script>

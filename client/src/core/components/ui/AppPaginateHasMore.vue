@@ -185,8 +185,9 @@ const disableNext = computed<boolean>(() => {
 watch(
     () => props.currentPage,
     (newVal, oldVal) => {
+        console.log('Changed')
         if (newVal > state.lastPageLoad && newVal > oldVal) {
-            state.lastPageLoad = props.currentPage
+            state.lastPageLoad = props.currentPage || 0
         }
     }
 )
@@ -194,6 +195,7 @@ watch(
 watch(
     () => props.hasMore,
     (newVal, oldVal) => {
+        console.log(newVal, oldVal)
         if (!newVal && oldVal) {
             state.hasLast = true
         }
