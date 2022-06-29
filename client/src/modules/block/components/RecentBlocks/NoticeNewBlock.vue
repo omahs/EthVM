@@ -7,7 +7,7 @@
 
 <script setup lang="ts">
 import { computed, reactive } from 'vue'
-import { useBlockSubscription } from '@core/mixins/newBlock.mixin'
+import { useBlockSubscription } from '@core/composables/NewBlock/newBlock.composable'
 
 const props = defineProps({
     pageId: {
@@ -18,7 +18,7 @@ const props = defineProps({
 
 const emit = defineEmits(['reload'])
 
-interface Reactive {
+interface ComponentState {
     display: boolean
     countTotal: number
     newTxsCount: number
@@ -27,7 +27,7 @@ interface Reactive {
     valueString: number
 }
 
-const state: Reactive = reactive({
+const state: ComponentState = reactive({
     display: false,
     countTotal: 0,
     newTxsCount: 0,

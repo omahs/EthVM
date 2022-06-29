@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 // Components
-import BlockStatsModule from '@module/block/BlockStatsModule.vue'
-import RecentBlocks from '@module/block/RecentBlocks.vue'
+import BlockStatsModule from '@module/block/ModuleBlockStats.vue'
+import RecentBlocks from '@module/block/ModuleRecentBlocks.vue'
 import ModuleTxs from '@module/txs/ModuleTxs.vue'
 </script>

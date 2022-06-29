@@ -120,13 +120,13 @@ const props = defineProps({
  * REFS
  * =======================================================
  */
-interface Reactive {
+interface ComponentState {
     validClass: string
     invalidClass: string
     isError: boolean
     pageDisplayUpdateTimeout: number | null
 }
-const state: Reactive = reactive({
+const state: ComponentState = reactive({
     validClass: 'center-input body-1 secondary--text',
     invalidClass: 'center-input body-1 error--text',
     isError: false,

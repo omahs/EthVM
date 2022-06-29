@@ -136,6 +136,7 @@ import { computed } from 'vue'
 import { eth, timeAgo } from '@core/helper'
 import { useDisplay } from 'vuetify/lib/framework.mjs'
 import { formatNumber, formatNonVariableEthValue } from '@core/helper/number-format-helper'
+import { SummaryFragment as TransferObj } from '@module/txs/apollo/transfersQuery.generated'
 
 const { mdAndDown, mdAndUp, smAndDown } = useDisplay()
 
@@ -151,7 +152,7 @@ const txStatusClass = computed<string>(() => {
     return transferObj.value.status ? 'tx-status-sucess table-row-mobile' : 'tx-status-fail table-row-mobile'
 })
 
-const transferObj = computed<any>(() => {
+const transferObj = computed<TransferObj>(() => {
     return props.tx ? props.tx.transfer : { transactionHash: '', block: 0, from: '', to: '', timestamp: 0, txFee: '', status: false, __typename: 'Transfer' }
 })
 

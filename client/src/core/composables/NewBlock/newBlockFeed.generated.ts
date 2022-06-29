@@ -3,7 +3,7 @@
  */
 /* eslint-disable */
 
-import * as Types from '../../apollo/types'
+import * as Types from '../../../apollo/types'
 
 import gql from 'graphql-tag'
 import * as VueApolloComposable from '@vue/apollo-composable'

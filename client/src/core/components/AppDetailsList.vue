@@ -80,7 +80,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, computed, watch } from 'vue'
+import { reactive, computed } from 'vue'
 import { Detail } from '@/core/components/props'
 import AppDetailsListRow from '@/core/components/AppDetailsListRow.vue'
 

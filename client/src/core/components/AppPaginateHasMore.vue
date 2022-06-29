@@ -98,11 +98,11 @@ const props = defineProps({
  * REFS
  * =======================================================
  */
-interface Reactive {
+interface ComponentState {
     hasLast: boolean
     lastPageLoad: number
 }
-const state: Reactive = reactive({
+const state: ComponentState = reactive({
     hasLast: false,
     lastPageLoad: 0
 })

@@ -39,7 +39,7 @@ import { useResult } from '@vue/apollo-composable'
 import TxsTable from '@module/txs/components/TxsTable.vue'
 import BN from 'bignumber.js'
 
-interface Reactive {
+interface ModuleState {
     initialLoad: boolean
     index: number
     isEnd: number
@@ -47,7 +47,7 @@ interface Reactive {
     hasError: boolean
 }
 
-const state: Reactive = reactive({
+const state: ModuleState = reactive({
     initialLoad: true,
     index: 0,
     isEnd: 0,
@@ -181,7 +181,7 @@ const { onResult: onNewTransferLoaded } = useNewTransfersCompleteFeedSubscriptio
 const allEthTransfers = useResult(getAllEthTransfers, null, data => data.getAllEthTransfers)
 const allBlockTransfersResult = useResult(getAllBlockTransfersResult, null, data => data.getBlockTransfers)
 
-onTxsArrayLoaded(result => {
+onTxsArrayLoaded(() => {
     state.initialLoad = false
 })
 
@@ -241,6 +241,15 @@ onMounted(() => {
     state.hasError = false
     refetchBlockTransfers()
 })
+
+watch(
+    () => props.blockRef,
+    () => {
+        state.initialLoad = true
+        state.hasError = false
+        refetchBlockTransfers({ _number: parseInt(props.blockRef) })
+    }
+)
 </script>
 <style scoped lang="css">
 .tx-filter-select-container {

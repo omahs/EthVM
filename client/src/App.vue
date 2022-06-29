@@ -8,11 +8,17 @@
 </template>
 
 <script setup lang="ts">
-import { provide } from 'vue'
-import { ApolloClients } from '@vue/apollo-composable'
-import clients from './apollo'
 import TheAppNavigationDrawer from '@core/components/TheAppNavigationDrawer.vue'
-provide(ApolloClients, clients)
+import { useStore } from '@/store'
+import { useGetLatestPricesQuery } from '@core/composables/CoinData/getLatestPrices.generated'
+const store = useStore()
+
+store.loadingCoinData = true
+const { result: coinData, loading: loadingCoinData, onResult } = useGetLatestPricesQuery({ pollInterval: 300000 })
+onResult(() => {
+    store.coinData = coinData.value
+    store.loadingCoinData = loadingCoinData.value
+})
 </script>
 
 <style lang="scss">

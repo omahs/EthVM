@@ -32,11 +32,11 @@
                             <app-tooltip v-if="detail.tooltip" :text="detail.tooltip" />
                             <v-row
                                 v-if="detail.priceChange && percentageChange.value"
-                                :class="[detail.tooltip ? 'pl-3' : 'pl-2', priceChangeClass, 'price-container', 'font-weight-medium']"
+                                :class="[detail.tooltip ? 'pl-3' : 'pl-2', priceChangeClass, 'price-container', 'font-weight-medium', 'my-0 ml-0']"
                                 row
                                 wrap
-                                align-center
-                                justify-start
+                                align="center"
+                                justify="start"
                             >
                                 (<span class="pl-1">{{ percentageChange.value }}%</span>
                                 <v-img v-if="priceChangeSymbol === '+'" :src="require('@/assets/up.png')" height="16px" max-width="16px" contain></v-img>
@@ -92,10 +92,10 @@ const props = defineProps<Props>()
 const priceChangeClass = computed<string>(() => {
     const change = props.detail.priceChange || 0
     if (change > 0) {
-        return 'txSuccess--text'
+        return 'text-green'
     }
     if (change < 0) {
-        return 'txFail--text'
+        return 'text-red'
     }
     return 'black--text'
 })

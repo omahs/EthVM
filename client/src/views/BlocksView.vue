@@ -4,6 +4,6 @@
 </template>
 
 <script setup lang="ts">
-import BlockStatsModule from '@module/block/BlockStatsModule.vue'
-import RecentBlocks from '@module/block/RecentBlocks.vue'
+import BlockStatsModule from '@module/block/ModuleBlockStats.vue'
+import RecentBlocks from '@module/block/ModuleRecentBlocks.vue'
 </script>

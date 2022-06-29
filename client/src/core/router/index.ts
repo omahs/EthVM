@@ -1,15 +1,19 @@
-import { createRouter, createWebHashHistory, createWebHistory, RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import { ROUTE_NAME } from './routesNames'
 import HomeView from '@view/HomeView.vue'
 import BlocksView from '@view/BlocksView.vue'
+import TxDetailsView from '@/views/TxDetailsView.vue'
 import BlockDetailsView from '@view/BlockDetailsView.vue'
+import TokenDetailsView from '@view/TokenDetailsView.vue'
 import TxsView from '@view/TxsView.vue'
 import ViewTemp from '@view/ViewTemp.vue'
+
 const routes: Array<RouteRecordRaw> = [
     {
         path: ROUTE_NAME.HOME.PATH,
         name: ROUTE_NAME.HOME.NAME,
-        component: HomeView
+        component: HomeView,
+        props: true
     },
     {
         path: ROUTE_NAME.BLOCKS.PATH,
@@ -36,7 +40,8 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: ROUTE_NAME.TX_HASH.PATH,
         name: ROUTE_NAME.TX_HASH.NAME,
-        component: ViewTemp
+        component: TxDetailsView,
+        props: true
     },
     {
         path: ROUTE_NAME.TXS_PENDING.PATH,
@@ -44,15 +49,10 @@ const routes: Array<RouteRecordRaw> = [
         component: ViewTemp
     },
     {
-        path: ROUTE_NAME.TOKENS.PATH,
-        name: ROUTE_NAME.TOKENS.NAME,
-        component: ViewTemp,
-        props: true
-    },
-    {
         path: ROUTE_NAME.TOKEN.PATH,
         name: ROUTE_NAME.TOKEN.NAME,
-        component: ViewTemp
+        component: TokenDetailsView,
+        props: true
     },
     {
         path: ROUTE_NAME.CHARTS.PATH,

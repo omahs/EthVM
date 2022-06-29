@@ -1,16 +1,20 @@
 fragment TxSummary on ETHTransfers {
     transfers {
         transfer {
-            transactionHash
-            to
-            block
-            timestamp
-            from
-            txFee
-            status
+            ...Summary
         }
         value
     }
+}
+
+fragment Summary on Transfer {
+    transactionHash
+    to
+    block
+    timestamp
+    from
+    txFee
+    status
 }
 
 query getBlockTransfers($_number: Int) {

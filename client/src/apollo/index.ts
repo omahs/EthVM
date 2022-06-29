@@ -58,7 +58,7 @@ const retry = new RetryLink({
     },
     attempts: {
         max: 10,
-        retryIf: (error, _operation) => (error && error.message ? error.message.includes('Failed to fetch') : false)
+        retryIf: error => (error && error.message ? error.message.includes('Failed to fetch') : false)
     }
 })
 const link = split(
