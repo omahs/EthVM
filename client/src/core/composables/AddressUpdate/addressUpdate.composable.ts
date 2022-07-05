@@ -11,7 +11,6 @@ export function useAddressUpdate(addressRef: string) {
 
     onResult(data => {
         if (data?.data?.addressEvent.event === AddressEventType.NewErc20Transfer) {
-            console.log('New address')
             newErc20Transfer.value += 1
         }
     })
