@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 import { computed, reactive, watch, onMounted, toRefs } from 'vue'
-import AppError from '@core/components/ui/AppError.vue'
+import AppError from '@core/components/AppError.vue'
 import ModuleAddressTokens from '@module/address/ModuleAddressTokens.vue'
 import ModuleAddressTokenTransfers from '@module/address/ModuleAddressTokenTransfers.vue'
 import { eth } from '@core/helper'

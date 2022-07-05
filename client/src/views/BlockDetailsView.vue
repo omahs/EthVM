@@ -29,8 +29,8 @@
 
 <script setup lang="ts">
 import { reactive, computed, onMounted, watch } from 'vue'
-import AppMessage from '@core/components/ui/AppMessage.vue'
-import AppError from '@core/components/ui/AppError.vue'
+import AppMessage from '@core/components/AppMessage.vue'
+import AppError from '@core/components/AppError.vue'
 import BlockTxs from '@module/txs/ModuleTxs.vue'
 import BlockDetails from '@module/block/ModuleBlockDetails.vue'
 import { eth } from '@core/helper'

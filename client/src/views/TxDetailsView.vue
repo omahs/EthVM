@@ -13,8 +13,8 @@
 
 <script setup lang="ts">
 import { reactive, computed } from 'vue'
-import AppMessage from '@/core/components/ui/AppMessage.vue'
-import AppError from '@/core/components/ui/AppError.vue'
+import AppMessage from '@/core/components/AppMessage.vue'
+import AppError from '@/core/components/AppError.vue'
 import { eth } from '@/core/helper'
 import TxDetails from '@/modules/txs/ModuleTxDetails.vue'
 import { ErrorMessageTx } from '@/modules/txs/models/ErrorMessagesForTx'

@@ -146,7 +146,7 @@
 
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
-import AppPaginate from '@core/components/ui/AppPaginate.vue'
+import AppPaginate from '@core/components/AppPaginate.vue'
 import { TokenOwnersFragment, useGetOwnersErc20TokensQuery } from '@module/address/apollo/tokens.generated'
 import { MarketDataFragment as TokenMarketData } from '@core/composables/CoinData/getLatestPrices.generated'
 import { useCoinData } from '@core/composables/CoinData/coinData.composable'

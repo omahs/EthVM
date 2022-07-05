@@ -104,10 +104,10 @@
 
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
-import AppPaginateHasMore from '@core/components/ui/AppPaginateHasMore.vue'
-import AppTooltip from '@core/components/ui/AppTooltip.vue'
-import AppTransformHash from '@core/components/ui/AppTransformHash.vue'
-import AppNewUpdate from '@core/components/ui/AppNewUpdate.vue'
+import AppPaginateHasMore from '@core/components/AppPaginateHasMore.vue'
+import AppTooltip from '@core/components/AppTooltip.vue'
+import AppTransformHash from '@core/components/AppTransformHash.vue'
+import AppNewUpdate from '@core/components/AppNewUpdate.vue'
 import { MarketDataFragment as TokenMarketData } from '@core/composables/CoinData/getLatestPrices.generated'
 import { useCoinData } from '@core/composables/CoinData/coinData.composable'
 import { TOKEN_FILTER_VALUES, TokenSort, Token } from '@module/address/models/TokenSort'
