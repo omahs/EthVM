@@ -9,6 +9,20 @@ import gql from 'graphql-tag'
 import * as VueApolloComposable from '@vue/apollo-composable'
 import * as VueCompositionApi from 'vue'
 export type ReactiveFunction<TParam> = () => TParam
+export type MarketDataFragment = {
+    __typename?: 'TokenMarketInfo'
+    id: string
+    symbol: string
+    name: string
+    image: string
+    contract?: string | null
+    current_price?: number | null
+    market_cap?: number | null
+    total_volume?: number | null
+    total_supply?: string | null
+    price_change_percentage_24h?: number | null
+}
+
 export type GetLatestPricesQueryVariables = Types.Exact<{ [key: string]: never }>
 
 export type GetLatestPricesQuery = {
@@ -28,21 +42,27 @@ export type GetLatestPricesQuery = {
     } | null>
 }
 
+export const MarketDataFragmentDoc = gql`
+    fragment MarketData on TokenMarketInfo {
+        id
+        symbol
+        name
+        image
+        contract
+        current_price
+        market_cap
+        total_volume
+        total_supply
+        price_change_percentage_24h
+    }
+`
 export const GetLatestPricesDocument = gql`
     query getLatestPrices {
         getLatestPrices {
-            id
-            symbol
-            name
-            image
-            contract
-            current_price
-            market_cap
-            total_volume
-            total_supply
-            price_change_percentage_24h
+            ...MarketData
         }
     }
+    ${MarketDataFragmentDoc}
 `
 
 /**

@@ -6,6 +6,7 @@ import TxDetailsView from '@/views/TxDetailsView.vue'
 import BlockDetailsView from '@view/BlockDetailsView.vue'
 import TokenDetailsView from '@view/TokenDetailsView.vue'
 import TxsView from '@view/TxsView.vue'
+import AddressTokensView from '@view/AddressTokensView.vue'
 import ViewTemp from '@view/ViewTemp.vue'
 
 const routes: Array<RouteRecordRaw> = [
@@ -63,6 +64,12 @@ const routes: Array<RouteRecordRaw> = [
         path: ROUTE_NAME.ADDRESS.PATH,
         name: ROUTE_NAME.ADDRESS.NAME,
         component: ViewTemp
+    },
+    {
+        path: ROUTE_NAME.ADDRESS_TOKENS.PATH,
+        name: ROUTE_NAME.ADDRESS_TOKENS.NAME,
+        component: AddressTokensView,
+        props: true
     },
     {
         path: ROUTE_NAME.FAV_ADDRESS.PATH,

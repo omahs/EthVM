@@ -1,21 +1,7 @@
-import { useGetLatestPricesQuery } from './getLatestPrices.generated'
+import { useGetLatestPricesQuery, MarketDataFragment as TokenMarketData } from './getLatestPrices.generated'
 import { computed } from 'vue'
 import { useStore } from '@/store'
 import { storeToRefs } from 'pinia'
-
-interface TokenMarketData {
-    __typename?: 'TokenMarketInfo'
-    id: string
-    symbol: string
-    name: string
-    image: string
-    contract?: string | null
-    current_price?: number | null
-    market_cap?: number | null
-    total_volume?: number | null
-    total_supply?: string | null
-    price_change_percentage_24h?: number | null
-}
 
 export function useCoinData() {
     const store = useStore()
@@ -57,6 +43,27 @@ export function useCoinData() {
     })
 
     /**
+     * Generate ethereum token map
+     * @param contracts String[]
+     * @returns {Map} TokenMarketData or {Boolean}
+     */
+    const getEthereumTokensMap = (contracts: string[]): Map<string, TokenMarketData> | false => {
+        if (!loadingCoinData.value) {
+            const requestMarketInfo = new Map<string, TokenMarketData>()
+            contracts.forEach(contract => {
+                const token = tokensMarketInfo.value.get(contract.toLowerCase())
+                if (token && token.contract) {
+                    requestMarketInfo.set(token.contract.toLowerCase(), token)
+                }
+            })
+            if (requestMarketInfo.size > 0) {
+                return requestMarketInfo
+            }
+        }
+        return false
+    }
+
+    /**
      * Generate ethereum tokens by contract
      * @param contract String[]
      * @returns {Map} TokenMarketData or {Boolean}
@@ -71,5 +78,5 @@ export function useCoinData() {
         return false
     }
 
-    return { ethereumTokens, filteredLatestPrice, getEthereumTokenByContract }
+    return { ethereumTokens, filteredLatestPrice, getEthereumTokenByContract, getEthereumTokensMap, loading: loadingCoinData }
 }

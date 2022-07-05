@@ -170,6 +170,8 @@ const transaction = computed<Tx>(() => {
         status: tx['status'] != null ? tx['status'] : false
     }
 })
+
+const a: string = 42
 </script>
 
 <style scoped lang="css">
