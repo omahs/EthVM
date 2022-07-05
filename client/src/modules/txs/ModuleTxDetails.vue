@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { reactive, computed, ref, onMounted } from 'vue'
 import BN from 'bignumber.js'
-import AppDetailsList from '@/core/components/ui/AppDetailsList.vue'
+import AppDetailsList from '@/core/components/AppDetailsList.vue'
 import TxDetailsTitle from '@module/txs/components/TxDetailsTitle.vue'
 import { Detail } from '@/core/components/props'
 import { TxDetailsFragment as TxDetailsType, useGetTransactionByHashQuery, useTransactionEventSubscription } from './apollo/TxDetails.generated'

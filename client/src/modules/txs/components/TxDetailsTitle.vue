@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import AppTooltip from '@/core/components/ui/AppTooltip.vue'
+import AppTooltip from '@/core/components/AppTooltip.vue'
 import { TitleStatus } from '@/modules/txs/models/ErrorMessagesForTx'
 
 const props = defineProps({

@@ -82,7 +82,7 @@
 <script setup lang="ts">
 import { reactive, computed } from 'vue'
 import { Detail } from '@/core/components/props'
-import AppDetailsListRow from '@/core/components/ui/AppDetailsListRow.vue'
+import AppDetailsListRow from '@/core/components/AppDetailsListRow.vue'
 
 interface Props {
     details: Detail[]

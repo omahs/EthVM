@@ -59,3 +59,7 @@ export enum EnumAdrChips {
     contract = 'contract',
     verified = 'verified'
 }
+export interface SearchTokenOption {
+    text: string
+    contract: string
+}

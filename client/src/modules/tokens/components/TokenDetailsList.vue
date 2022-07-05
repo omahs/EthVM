@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { Detail } from '@core/components/props'
-import AppDetailsList from '@core/components/ui/AppDetailsList.vue'
+import AppDetailsList from '@core/components/AppDetailsList.vue'
 import { Hex } from '@core/models'
 import BN from 'bignumber.js'
 import { ConfigHelper } from '@core/helper/config-helper'

@@ -10,8 +10,8 @@
 import { computed, reactive, watch } from 'vue'
 import TokenDetails from '@module/tokens/ModuleTokenDetails.vue'
 import { ErrorMessageToken } from '@module/tokens/models/ErrorMessagesForTokens'
-import AppMessage from '@core/components/ui/AppMessage.vue'
-import AppError from '@core/components/ui/AppError.vue'
+import AppMessage from '@core/components/AppMessage.vue'
+import AppError from '@core/components/AppError.vue'
 import { eth } from '@core/helper'
 import { useRoute } from 'vue-router'
 

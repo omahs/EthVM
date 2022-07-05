@@ -127,11 +127,11 @@
 </template>
 
 <script setup lang="ts">
-import AppTransformHash from '@core/components/ui/AppTransformHash.vue'
+import AppTransformHash from '@core/components/AppTransformHash.vue'
 
 import BN from 'bignumber.js'
 import { Tx } from '../types'
-import AppTooltip from '@core/components/ui/AppTooltip.vue'
+import AppTooltip from '@/core/components/AppTooltip.vue'
 import { computed } from 'vue'
 import { eth, timeAgo } from '@core/helper'
 import { useDisplay } from 'vuetify/lib/framework.mjs'

@@ -27,9 +27,9 @@
 </template>
 
 <script setup lang="ts">
-import AppTableTitle from '@core/components/ui/AppTableTitle.vue'
+import AppTableTitle from '@core/components/AppTableTitle.vue'
 import TableBlocks from '@/modules/block/components/RecentBlocks/BlocksTable.vue'
-import AppPaginate from '@core/components/ui/AppPaginate.vue'
+import AppPaginate from '@core/components/AppPaginate.vue'
 import NoticeNewBlock from '@/modules/block/components/RecentBlocks/NoticeNewBlock.vue'
 import BN from 'bignumber.js'
 import {

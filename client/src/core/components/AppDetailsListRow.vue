@@ -73,9 +73,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Detail } from '@/core/components/props'
-import AppCopyToClip from '@/core/components/ui/AppCopyToClip.vue'
-import AppTransformHash from '@/core/components/ui/AppTransformHash.vue'
-import AppTooltip from '@/core/components/ui/AppTooltip.vue'
+import AppCopyToClip from '@/core/components/AppCopyToClip.vue'
+import AppTransformHash from '@/core/components/AppTransformHash.vue'
+import AppTooltip from '@/core/components/AppTooltip.vue'
 import BN from 'bignumber.js'
 import { formatPercentageValue, FormattedNumber } from '@/core/helper/number-format-helper'
 import { eth } from '@/core/helper/eth'
