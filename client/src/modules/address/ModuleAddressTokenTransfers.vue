@@ -1,7 +1,10 @@
 <template>
     <v-card>
         <v-card-title class="justify-space-between">
-            Token Transfer History
+            <div>
+                Token Transfer History
+                <app-new-update text="New ERC20 Transfers" :update-count="newErc20Transfer" @reload="setPage(0, true)" />
+            </div>
             <app-paginate-has-more
                 :class="smAndDown ? 'pt-3' : ''"
                 :has-more="hasMore"
@@ -104,15 +107,16 @@ import { computed, reactive, ref } from 'vue'
 import AppPaginateHasMore from '@core/components/ui/AppPaginateHasMore.vue'
 import AppTooltip from '@core/components/ui/AppTooltip.vue'
 import AppTransformHash from '@core/components/ui/AppTransformHash.vue'
+import AppNewUpdate from '@core/components/ui/AppNewUpdate.vue'
 import { MarketDataFragment as TokenMarketData } from '@core/composables/CoinData/getLatestPrices.generated'
 import { useCoinData } from '@core/composables/CoinData/coinData.composable'
 import { TOKEN_FILTER_VALUES, TokenSort, Token } from '@module/address/models/TokenSort'
 import { formatFloatingPointValue, formatPercentageValue, FormattedNumber, formatUsdValue } from '@core/helper/number-format-helper'
 const { getEthereumTokensMap, loading: loadingEthTokens, getEthereumTokenByContract } = useCoinData()
-import BN from 'bignumber.js'
 import { useDisplay } from 'vuetify/lib/framework.mjs'
 import { TransferFragmentFragment as Transfer, useGetAddressErc20TransfersQuery } from '@module/address/apollo/transfers.generated'
 import { eth, timeAgo } from '@core/helper'
+import BN from 'bignumber.js'
 
 const MAX_ITEMS = 10
 const TYPES = ['in', 'out', 'self']
@@ -122,8 +126,11 @@ const props = defineProps({
     addressHash: {
         type: String,
         required: true
-    }
+    },
+    newErc20Transfer: Number
 })
+
+const emit = defineEmits(['resetCount'])
 
 interface ComponentState {
     showMoreTokenDetails: boolean
@@ -144,7 +151,8 @@ const state: ComponentState = reactive({
 const {
     result,
     loading: loadingTransfers,
-    fetchMore
+    fetchMore,
+    refetch
 } = useGetAddressErc20TransfersQuery(
     () => ({
         hash: props.addressHash,
@@ -232,24 +240,29 @@ const getAmount = (transfer: Transfer) => {
     return formatFloatingPointValue(getValue(transfer))
 }
 
-const setPage = (page: number, reset: boolean) => {
-    if (page > state.index && hasMore.value) {
-        fetchMore({
-            variables: {
-                hash: props.addressHash,
-                _limit: MAX_ITEMS,
-                _nextKey: result.value?.getERC20Transfers?.nextKey
-            },
-            updateQuery: (prev, { fetchMoreResult }) => {
-                return {
-                    getERC20Transfers: {
-                        nextKey: fetchMoreResult?.getERC20Transfers.nextKey,
-                        transfers: [...prev.getERC20Transfers.transfers, ...(fetchMoreResult?.getERC20Transfers.transfers || [])],
-                        __typename: fetchMoreResult?.getERC20Transfers.__typename
+const setPage = (page: number, reset = false) => {
+    if (reset) {
+        refetch()
+        emit('resetCount')
+    } else {
+        if (page > state.index && hasMore.value) {
+            fetchMore({
+                variables: {
+                    hash: props.addressHash,
+                    _limit: MAX_ITEMS,
+                    _nextKey: result.value?.getERC20Transfers?.nextKey
+                },
+                updateQuery: (prev, { fetchMoreResult }) => {
+                    return {
+                        getERC20Transfers: {
+                            nextKey: fetchMoreResult?.getERC20Transfers.nextKey,
+                            transfers: [...prev.getERC20Transfers.transfers, ...(fetchMoreResult?.getERC20Transfers.transfers || [])],
+                            __typename: fetchMoreResult?.getERC20Transfers.__typename
+                        }
                     }
                 }
-            }
-        })
+            })
+        }
     }
     state.index = page
 }
