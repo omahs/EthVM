@@ -68,7 +68,7 @@ export type GetAddressErc20TransfersQueryVariables = Types.Exact<{
 
 export type GetAddressErc20TransfersQuery = {
     __typename?: 'Query'
-    getERC20Transfers: {
+    getERC20TransfersV2Tmp: {
         __typename?: 'ERC20Transfers'
         nextKey?: string | null
         transfers: Array<{
@@ -247,7 +247,7 @@ export type GetAddressEthTransfersQueryCompositionFunctionResult = VueApolloComp
 >
 export const GetAddressErc20TransfersDocument = gql`
     query getAddressERC20Transfers($hash: String!, $_limit: Int, $_nextKey: String) {
-        getERC20Transfers(owner: $hash, limit: $_limit, nextKey: $_nextKey) {
+        getERC20TransfersV2Tmp(owner: $hash, limit: $_limit, nextKey: $_nextKey) {
             transfers {
                 ...TransferFragment
             }

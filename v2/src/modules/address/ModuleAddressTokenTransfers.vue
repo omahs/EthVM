@@ -140,10 +140,13 @@ const {
 )
 
 const hasMore = computed<boolean>(() => {
-    return result.value?.getERC20Transfers.nextKey !== null
+    return result.value?.getERC20TransfersV2Tmp.nextKey !== null
 })
 
-const transferHistory = computed<Array<Transfer | null>>(() => result.value?.getERC20Transfers.transfers || [])
+const transferHistory = computed<Array<Transfer | null>>(() => {
+    console.log(result)
+    return result.value?.getERC20TransfersV2Tmp.transfers || []
+})
 
 /**
  * Render State Tracking
@@ -203,14 +206,14 @@ const setPage = (page: number, reset = false) => {
                 variables: {
                     hash: props.addressHash,
                     _limit: MAX_ITEMS,
-                    _nextKey: result.value?.getERC20Transfers?.nextKey
+                    _nextKey: result.value?.getERC20TransfersV2Tmp?.nextKey
                 },
                 updateQuery: (prev, { fetchMoreResult }) => {
                     return {
-                        getERC20Transfers: {
-                            nextKey: fetchMoreResult?.getERC20Transfers.nextKey,
-                            transfers: [...prev.getERC20Transfers.transfers, ...(fetchMoreResult?.getERC20Transfers.transfers || [])],
-                            __typename: fetchMoreResult?.getERC20Transfers.__typename
+                        getERC20TransfersV2Tmp: {
+                            nextKey: fetchMoreResult?.getERC20TransfersV2Tmp.nextKey,
+                            transfers: [...prev.getERC20TransfersV2Tmp.transfers, ...(fetchMoreResult?.getERC20TransfersV2Tmp.transfers || [])],
+                            __typename: fetchMoreResult?.getERC20TransfersV2Tmp.__typename
                         }
                     }
                 }
