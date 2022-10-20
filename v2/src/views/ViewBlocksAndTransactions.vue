@@ -26,10 +26,9 @@ import ModuleTxs from '@module/txs/ModuleTxs.vue'
 import RecentBlocks from '@module/block/ModuleRecentBlocks.vue'
 import AppTabs from '@/core/components/AppTabs.vue'
 import { Tab } from '@core/components/props'
-import { onMounted, reactive } from 'vue'
+import { reactive } from 'vue'
 import { useAppViewGrid } from '@core/composables/AppViewGrid/AppViewGrid.composable'
 import { Q_BLOCKS_AND_TXS } from '@core/router/routesNames'
-import { useRoute, useRouter } from 'vue-router'
 
 const { columnPadding, rowMargin } = useAppViewGrid()
 

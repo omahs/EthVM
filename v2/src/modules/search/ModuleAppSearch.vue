@@ -94,7 +94,6 @@ import { Q_TOKEN_DETAILS, ROUTE_NAME, ROUTE_PROP } from '@core/router/routesName
 import { useRouter } from 'vue-router'
 import { Buffer } from 'buffer'
 import { useCoinData } from '@core/composables/CoinData/coinData.composable'
-import { MarketDataFragment } from '@/core/composables/CoinData/getLatestPrices.generated'
 import { formatUsdValue } from '@/core/helper/number-format-helper'
 import BN from 'bignumber.js'
 /*

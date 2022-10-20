@@ -94,22 +94,8 @@ const getTitle = computed<string>(() => {
     return titles[props.pageType]
 })
 
-const loading = computed<boolean>(() => {
-    if (state.hasError) {
-        return true
-    }
-    if (isHome.value) {
-        return state.initialLoad
-    }
-    return loadingBlocks.value
-})
-
 const isHome = computed<boolean>(() => {
     return props.pageType === 'home'
-})
-
-const currentPage = computed<number>(() => {
-    return state.index
 })
 
 const showPagination = computed<boolean>(() => {
@@ -123,7 +109,6 @@ const showPagination = computed<boolean>(() => {
  */
 const {
     result: blockArrays,
-    loading: loadingBlocks,
     onResult: onBlockArrayLoaded,
     subscribeToMore,
     refetch: refetchBlockArray,

@@ -34,7 +34,7 @@
                 Token:
                 XS: NONE
                 SM : 4
-                LG: 2 
+                LG: 2
              -->
             <v-col sm="4" :lg="props.isOverview ? 4 : 2" class="py-0 d-none d-sm-block">
                 <v-btn variant="text" color="info" class="font-weight-regular ml-n3" rounded="pill" size="small" @click="sortTable(SORT_KEY.NAME)">
@@ -59,7 +59,7 @@
                 XS: NONE
                 SM: 8
                 ------------
-                OTHER 
+                OTHER
                 XS: NONE
                 SM: 8
                 LG: 9
@@ -135,7 +135,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, onMounted, onBeforeUnmount, toRefs, watch } from 'vue'
+import { computed, reactive, onMounted, onBeforeUnmount, toRefs } from 'vue'
 import AppBtn from '@/core/components/AppBtn.vue'
 import AppNewUpdate from '@core/components/AppNewUpdate.vue'
 import TableRowTokenBalance from './components/TableRowTokenBalance.vue'

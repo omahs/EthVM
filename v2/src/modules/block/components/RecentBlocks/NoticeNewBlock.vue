@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import AppNewUpdate from '@core/components/AppNewUpdate.vue'
-import { computed, reactive } from 'vue'
+import { reactive } from 'vue'
 import { useBlockSubscription } from '@core/composables/NewBlock/newBlock.composable'
 
 const props = defineProps({
@@ -60,10 +60,6 @@ const onReload = () => {
     state.newTxsCount = 0
     state.newUncles = 0
 }
-
-const buttonText = computed<string>(() => {
-    return `${state.valueString} New Blocks`
-})
 </script>
 
 <style scoped></style>

@@ -98,7 +98,6 @@ import AppTabs from '@core/components/AppTabs.vue'
 import { Tab } from '@/core/components/props'
 import TokenMarketInfoTableRow from '@module/tokens/components/TokenMarketInfo/TableRowTokenMarketInfo.vue'
 import ModuleAddFavToken from './ModuleAddFavToken.vue'
-import { useDisplay } from 'vuetify'
 import { computed, reactive } from 'vue'
 import { useStore } from '@/store'
 import { useCoinData } from '@core/composables/CoinData/coinData.composable'
@@ -110,7 +109,6 @@ const routes = ADDRESS_ROUTE_QUERY.Q_NFTS
 
 // const MAX_TOKENS = 200
 const store = useStore()
-const { smAndDown } = useDisplay()
 
 const list: Tab[] = [
     {
@@ -182,14 +180,6 @@ const isActiveSort = (key: KEY): boolean => {
 }
 
 const SORT_KEY = KEY
-
-/**
- * Sets page number and reset value and emit
- * @param page {Number}
- */
-const setPage = (page: number): void => {
-    state.index = page
-}
 
 const sortTable = (key: KEY): void => {
     state.sortDirection = state.sortDirection === DIRECTION.HIGH ? DIRECTION.LOW : DIRECTION.HIGH

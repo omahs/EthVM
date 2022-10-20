@@ -95,9 +95,8 @@
 <script setup lang="ts">
 import { Detail } from '@core/components/props'
 import TokenDetailsSocials from '@module/tokens/components/TokenDetailsSocials.vue'
-import { Hex } from '@core/models'
 import BN from 'bignumber.js'
-import { formatFloatingPointValue, formatNumber, formatPercentageValue, FormattedNumber, formatUsdValue } from '@core/helper/number-format-helper'
+import { formatNumber, formatPercentageValue, formatUsdValue } from '@core/helper/number-format-helper'
 import { useCoinData } from '@core/composables/CoinData/coinData.composable'
 import {
     GetErc20TokenBalanceQuery as TokenOwnerInfo,
@@ -180,67 +179,6 @@ const loadingTokenData = computed<boolean>(() => {
     return loadingCoinData.value || props.isLoading
 })
 
-/**
- * Get details list for token detail view
- */
-const tokenDetailsList = computed<Detail[]>(() => {
-    const details = [contractDetail.value]
-    contractDecimalsDetail.value.detail ? details.push(contractDecimalsDetail.value) : null
-    if (props.holderDetails && props.holderDetails.owner && contractOwnerDetail.value.detail) {
-        details.push(contractOwnerDetail.value)
-    }
-    if (!props.isRopsten && priceDetail.value.detail) {
-        details.push(priceDetail.value)
-    }
-    supplyDetail.value.detail ? details.push(supplyDetail.value) : null
-    if (!state.isRopsten) {
-        marketCapDetail.value.detail ? details.push(marketCapDetail.value) : null
-        volumeDetail.value.detail ? details.push(volumeDetail.value) : null
-    }
-    return details
-})
-
-/**
- * Get details list for holder detail view
- */
-const holderDetailsList = computed<Detail[]>(() => {
-    const details = [holderDetail.value, holderBalanceDetail.value]
-    if (!state.isRopsten && holderUsdDetail.value.detail) {
-        details.push(holderUsdDetail.value)
-    }
-    // details.push(holderTransfersDetail.value)
-    return details.concat(tokenDetailsList.value)
-})
-
-const contractDetail = computed<Detail>(() => {
-    const detail: Detail = { title: 'Contract' }
-    if (!props.isLoading && props.tokenDetails) {
-        detail.detail = new Hex(props.tokenDetails.contract).toString()
-        detail.link = `/address/${new Hex(props.tokenDetails.contract).toString()}`
-        detail.copy = true
-        detail.toChecksum = true
-    }
-    return detail
-})
-
-const contractOwnerDetail = computed<Detail>(() => {
-    const detail: Detail = { title: 'Owner' }
-    if (!props.isLoading && props.holderDetails && props.holderDetails.owner) {
-        detail.detail = props.holderDetails.owner
-        detail.link = `/address/${props.holderDetails.owner}`
-        detail.copy = true
-        detail.toChecksum = true
-    }
-    return detail
-})
-
-const contractDecimalsDetail = computed<Detail>(() => {
-    return {
-        title: 'Decimals',
-        detail: !props.isLoading && props.tokenDetails && props.tokenDetails.decimals != null ? props.tokenDetails.decimals : undefined
-    }
-})
-
 const priceDetail = computed<Detail>(() => {
     const detail: Detail = { title: 'Price' }
     if (!props.isLoading && tokenData.value) {
@@ -318,65 +256,11 @@ const volumeDetail = computed<Detail>(() => {
     }
 })
 
-const holderDetail = computed<Detail>(() => {
-    const detail: Detail = { title: 'Holder' }
-    if (!props.isLoading && props.holderDetails && props.holderDetails.owner) {
-        detail.detail = props.holderDetails.owner
-        detail.link = `/address/${props.holderDetails.owner}`
-        detail.copy = true
-        detail.toChecksum = true
-    }
-    return detail
-})
-
-const holderBalanceDetail = computed<Detail>(() => {
-    const detail: Detail = { title: 'Balance' }
-    if (!props.isLoading && props.tokenDetails && props.holderDetails) {
-        const symbol = props.tokenDetails.symbol === null || !props.tokenDetails.symbol ? '' : ` ${props.tokenDetails.symbol.toUpperCase()}`
-        detail.detail = `${balance.value.value}${symbol}`
-        detail.tooltip = balance.value.tooltipText ? balance.value.tooltipText : undefined
-    }
-    return detail
-})
-
-const holderUsdDetail = computed<Detail>(() => {
-    return {
-        title: 'Total USD Value',
-        detail: !props.isLoading && props.tokenDetails ? balanceUsd.value : undefined
-    }
-})
-
-const balanceUsd = computed<string | undefined>(() => {
-    if (!props.holderDetails) {
-        return ''
-    }
-
-    const decimals = props.tokenDetails.decimals
-    let n = new BN(props.holderDetails.balance)
-
-    if (decimals) {
-        n = n.div(new BN(10).pow(decimals))
-    }
-
-    return props.holderDetails.balance && tokenData.value && tokenData.value.current_price
-        ? formatUsdValue(n.multipliedBy(tokenData.value.current_price)).value
-        : undefined
-})
-
 const tokenHistory = computed<string>(() => {
     return (
         'Binance Coin (BNB) is an exchange-based token created and issued by the cryptocurrency exchange Binance. Initially created on the Ethereum blockchain as an ERC-20 token in July 2017, BNB was migrated over to Binance Chain in February 2019 and became the native coin of the Binance Chain.\n' +
         'Binance Coin has seen massive growth in interest throughout the years. Several rounds of token burn events have appreciated BNB price and pushed it up as one of the top-10 cryptocurrencies by market capitalization. BNB can be traded in over 300 trading pairs across 120 exchanges tracked. '
     )
-})
-
-const balance = computed<FormattedNumber>(() => {
-    const decimals = props.tokenDetails.decimals
-    let n = new BN(props.holderDetails.balance)
-    if (decimals) {
-        n = n.div(new BN(10).pow(decimals))
-    }
-    return formatFloatingPointValue(n)
 })
 </script>
 <style lang="scss" scoped>

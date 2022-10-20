@@ -69,7 +69,7 @@
 import AppTransformHash from '@core/components/AppTransformHash.vue'
 import AppBtnIcon from '@core/components/AppBtnIcon.vue'
 import { TokenMarket } from '@module/address/models/TokenSort'
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive } from 'vue'
 import { eth } from '@core/helper'
 import { useDisplay } from 'vuetify'
 import { useStore } from '@/store'

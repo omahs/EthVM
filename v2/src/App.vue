@@ -19,7 +19,7 @@ import TheAppNavigationDrawerVue from './core/components/TheAppNavigationDrawer.
 import { useStore } from '@/store'
 import { useGetLatestPricesQuery } from '@core/composables/CoinData/getLatestPrices.generated'
 import { useTheme } from 'vuetify'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { ROUTE_NAME } from '@core/router/routesNames'
 

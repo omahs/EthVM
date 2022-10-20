@@ -109,7 +109,7 @@ const showSearchbar = computed<boolean>(() => {
     return true
 })
 
-const onScroll = e => {
+const onScroll = () => {
     nextTick(() => {
         offset.value = window.scrollY
     })

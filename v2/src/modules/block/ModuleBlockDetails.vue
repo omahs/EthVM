@@ -24,7 +24,6 @@
 
 <script setup lang="ts">
 import AppTabs from '@/core/components/AppTabs.vue'
-import BlockDetails from '@module/block/components/BlockDetails.vue'
 import MoreBlockDetails from '@module/block/components/MoreBlockDetails.vue'
 import BlockTxs from '@module/txs/ModuleTxs.vue'
 import { reactive, computed, ref, onMounted, watch } from 'vue'
@@ -42,8 +41,7 @@ import { FormattedNumber, formatNumber, formatVariableUnitEthValue } from '@/cor
 import { useNewBlockFeedSubscription } from '@core/composables/NewBlock/newBlockFeed.generated'
 import { useBlockSubscription } from '@core/composables/NewBlock/newBlock.composable'
 import { useQuery } from '@vue/apollo-composable'
-import { timeAgo, eth } from '@core/helper'
-import { useRoute, useRouter } from 'vue-router'
+import { timeAgo } from '@core/helper'
 import { Q_BLOCK_DETAILS } from '@core/router/routesNames'
 const routes = Q_BLOCK_DETAILS
 
@@ -314,19 +312,6 @@ const blockNumber = computed<string | number>(() => {
 const emitErrorState = (val: boolean): void => {
     state.hasError = val
     emit('errorDetails', state.hasError, ErrorMessageBlock.details)
-}
-
-const router = useRouter()
-const route = useRoute()
-/**
- * Sets route query if new tab is selected
- */
-const changeRoute = () => {
-    if (route.query.t !== state.tab) {
-        router.push({
-            query: { t: state.tab }
-        })
-    }
 }
 
 onMounted(() => {

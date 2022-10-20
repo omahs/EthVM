@@ -81,7 +81,6 @@ import AppBtnIcon from '@/core/components/AppBtnIcon.vue'
 import AppCopyToClip from '@/core/components/AppCopyToClip.vue'
 import AppAddressBlockie from '@/core/components/AppAddressBlockie.vue'
 import AppTransformHash from '@/core/components/AppTransformHash.vue'
-import AppMenu from '@/core/components/AppMenu.vue'
 import { useDisplay } from 'vuetify/lib/framework.mjs'
 
 const { smAndDown, xs } = useDisplay()
