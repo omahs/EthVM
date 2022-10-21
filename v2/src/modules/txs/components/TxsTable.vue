@@ -49,45 +49,67 @@ import { computed } from 'vue'
 import TxsTableRow from '@module/txs/components/TxsTableRow.vue'
 import AppIntersect from '@core/components/AppIntersect.vue'
 import AppNoResult from '@core/components/AppNoResult.vue'
+import { TransferFragment } from '@module/txs/apollo/transfersQuery.generated'
 
 const { xs, mdAndDown } = useDisplay()
 
-const props = defineProps({
-    txsData: Array,
-    isLoading: Boolean,
-    maxItems: Number,
-    index: Number,
-    address: {
-        type: String,
-        default: ''
-    },
-    tableMessage: {
-        type: String,
-        default: ''
-    },
-    pending: {
-        type: Boolean,
-        default: false
-    },
-    isScrollView: {
-        type: Boolean,
-        default: false
-    },
-    isBlock: {
-        type: Boolean,
-        default: false
-    },
-    showIntersect: {
-        type: Boolean,
-        default: false
-    }
+interface PropType {
+    txsData: Array<TransferFragment | null>
+    isLoading: boolean
+    maxItems: number
+    index: number
+    address?: string
+    tableMessage: string
+    pending?: boolean
+    isScrollView?: boolean
+    isBlock?: boolean
+    showIntersect?: boolean
+}
+
+const props = withDefaults(defineProps<PropType>(), {
+    address: '',
+    pending: false,
+    isScrollView: false,
+    isBlock: false,
+    showIntersect: false
 })
+//
+// const props = defineProps({
+//     txsData: Array,
+//     isLoading: Boolean,
+//     maxItems: Number,
+//     index: Number,
+//     address: {
+//         type: String,
+//         default: ''
+//     },
+//     tableMessage: {
+//         type: String,
+//         default: ''
+//     },
+//     pending: {
+//         type: Boolean,
+//         default: false
+//     },
+//     isScrollView: {
+//         type: Boolean,
+//         default: false
+//     },
+//     isBlock: {
+//         type: Boolean,
+//         default: false
+//     },
+//     showIntersect: {
+//         type: Boolean,
+//         default: false
+//     }
+// })
 
 const hasMessage = computed<boolean>(() => {
     return props.tableMessage !== ''
 })
 
-const displayData = computed<any[]>(() => {
+const displayData = computed<Array<TransferFragment | null>>(() => {
     if (props.isBlock && props.txsData) {
         const maxItems = props.maxItems || 10
         const index = props.index || 0

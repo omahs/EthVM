@@ -70,8 +70,8 @@ const showLarge = computed<boolean>(() => {
 ===================================================================================
 */
 
-const debounce = (handler, timer: number): any => {
-    let debounceTimer
+const debounce = <T extends () => void>(handler: T, timer: number) => {
+    let debounceTimer: ReturnType<typeof setTimeout>
     return function () {
         const args = arguments
         clearTimeout(debounceTimer)

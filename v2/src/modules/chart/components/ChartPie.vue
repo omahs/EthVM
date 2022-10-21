@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import { Doughnut } from 'vue-chartjs'
-import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement, CategoryScale, ChartData, ChartOptions } from 'chart.js'
+import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement, CategoryScale, ChartData } from 'chart.js'
 ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale)
 
 /* Hide legened */

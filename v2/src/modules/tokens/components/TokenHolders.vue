@@ -139,7 +139,7 @@ const hasERC20Owners = computed<boolean>(() => {
     return !!erc20TokenHolders.value && erc20TokenHolders.value?.owners.length > 0
 })
 
-const holders = computed<any[]>(() => {
+const holders = computed<Array<Erc20TokenOwnersType | Erc721TokenOwnersType | null>>(() => {
     if (hasERC20Owners.value || hasERC721Owners.value) {
         const data = hasERC721Owners.value ? erc721TokenHolders.value?.owners : erc20TokenHolders.value?.owners
         if (data) {
