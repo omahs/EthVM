@@ -53,7 +53,7 @@ You can run Sepolia front end locally, you will need:
 
 1. Open terminal
 2. Clone the repo: git clone git@github.com:https://github.com/EthVM/EthVM.git
-3. run `cd v2`. Note that front end codebase files are located under v2 folder at this momoment.
+3. run `cd v2`. Note that front end codebase files are located under v2 folder at this moment.
 4. Create local .env file:
   `nano ./.env `
   
